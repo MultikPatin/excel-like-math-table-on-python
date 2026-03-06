@@ -6,17 +6,20 @@ from src._types import AnyMatrix
 from .layout import Layout
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True, kw_only=True)
 class Sheet:
-    data: AnyMatrix
+    matrix: AnyMatrix
     layout: Layout
 
     def __post_init__(self) -> None:
-        if len(self.data) < 1:
+        if len(self.matrix) < 1:
             msg = "Sheet must contain at least 1 row"
             raise ValueError(msg)
-        if len(self.data[0]) < 1:
+        if len(self.matrix[0]) < 1:
             msg = "Sheet must contain at least 1 column"
+            raise ValueError(msg)
+        if self.columns != self.layout.columns:
+            msg = "Sheet must have the same number of columns as layout schemas"
             raise ValueError(msg)
 
     @cached_property
@@ -25,8 +28,8 @@ class Sheet:
 
     @cached_property
     def rows(self) -> int:
-        return len(self.data)
+        return len(self.matrix)
 
     @cached_property
     def columns(self) -> int:
-        return len(self.data[0])
+        return len(self.matrix[0])

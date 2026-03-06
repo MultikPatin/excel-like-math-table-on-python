@@ -1,5 +1,5 @@
-from .operations import OperatioEnum
+from .operations import OperationEnum
 
 __all__ = [
-    "OperatioEnum",
+    "OperationEnum",
 ]

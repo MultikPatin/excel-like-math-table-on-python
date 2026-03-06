@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class OperatioEnum(Enum):
+class OperationEnum(Enum):
     ADD = "+"
     SUB = "-"
     MUL = "*"
