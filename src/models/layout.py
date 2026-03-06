@@ -3,8 +3,7 @@ from functools import cached_property
 from typing import Any
 
 from src.enums.layout import LayoutDataTypeEnum
-
-# from .operations import Operation
+from src.protocols import SheetProtocol
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -26,8 +25,6 @@ class Validation:
 class Layout:
     schemas: list[Schema]
     validations: list[Validation | None] = field(default_factory=list)
-    # operations: list[Operation] = field(default_factory=list, init=False)
-    # rows: int = 0
 
     def __post_init__(self) -> None:
         if self.columns < 1:
@@ -44,18 +41,7 @@ class Layout:
     def columns(self) -> int:
         return len(self.schemas)
 
-    # def add_operation(self, opr: Operation) -> None:
-    #     for operand in opr.operands:
-    #         if operand.col_idx > self.columns:
-    #             msg = (
-    #                 f"Column index of operand ({operand}) must be "
-    #                 f"less or equal to the number of schemas ({self.columns})"
-    #             )
-    #             raise ValueError(msg)
-    #     if opr.result.col_idx > self.columns:
-    #         msg = (
-    #             f"Column index of result ({opr.result}) must be "
-    #             f"less or equal to the number of schemas ({self.columns})"
-    #         )
-    #         raise ValueError(msg)
-    #     self.operations.append(opr)
+    def is_valid_sheet(self, sheet: SheetProtocol) -> None:
+        if self.columns != sheet.columns:
+            msg = "Sheet must have the same number of columns as layout schemas"
+            raise ValueError(msg)

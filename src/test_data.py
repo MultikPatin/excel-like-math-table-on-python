@@ -1,8 +1,6 @@
 from src.enums.layout import LayoutDataTypeEnum
 from src.enums.operations import OperationEnum
-from src.models import Layout, Position, Schema, SimpleOperation
-
-matrix = [[0 for _ in range(4)] for _ in range(4)]
+from src.models import Layout, Position, Schema, Sheet, TwoOperandsOperation
 
 pos00 = Position(row_idx=0, col_idx=0)
 pos01 = Position(row_idx=0, col_idx=1)
@@ -25,31 +23,31 @@ pos32 = Position(row_idx=3, col_idx=2)
 pos33 = Position(row_idx=3, col_idx=3)
 
 operations = [
-    SimpleOperation(
+    TwoOperandsOperation(
         first_operand=pos00,
         second_operand=pos10,
         operation=OperationEnum.ADD,
         result=pos30,
     ),
-    SimpleOperation(
+    TwoOperandsOperation(
         first_operand=pos01,
         second_operand=pos11,
         operation=OperationEnum.MUL,
         result=pos31,
     ),
-    SimpleOperation(
+    TwoOperandsOperation(
         first_operand=pos02,
         second_operand=pos12,
         operation=OperationEnum.MUL,
         result=pos32,
     ),
-    SimpleOperation(
+    TwoOperandsOperation(
         first_operand=pos30,
         second_operand=pos31,
         operation=OperationEnum.MUL,
         result=pos02,
     ),
-    SimpleOperation(
+    TwoOperandsOperation(
         first_operand=pos01,
         second_operand=pos11,
         operation=OperationEnum.SUB,
@@ -57,28 +55,31 @@ operations = [
     ),
 ]
 
+_schemas = [
+    Schema(
+        key="col 1",
+        type=LayoutDataTypeEnum.integer,
+        default=1,
+    ),
+    Schema(
+        key="col 2",
+        type=LayoutDataTypeEnum.integer,
+        default=1,
+    ),
+    Schema(
+        key="col 3",
+        type=LayoutDataTypeEnum.integer,
+        default=1,
+    ),
+    Schema(
+        key="col4",
+        type=LayoutDataTypeEnum.integer,
+        default=1,
+    ),
+]
 
-layout = Layout(
-    schemas=[
-        Schema(
-            key="col 1",
-            type=LayoutDataTypeEnum.integer,
-            default=1,
-        ),
-        Schema(
-            key="col 2",
-            type=LayoutDataTypeEnum.integer,
-            default=1,
-        ),
-        Schema(
-            key="col 3",
-            type=LayoutDataTypeEnum.integer,
-            default=1,
-        ),
-        Schema(
-            key="col4",
-            type=LayoutDataTypeEnum.integer,
-            default=1,
-        ),
-    ]
-)
+layout = Layout(schemas=_schemas)
+
+_matrix = [[0 for _ in range(4)] for _ in range(4)]
+
+sheet = Sheet(matrix=_matrix)

@@ -1,5 +1,5 @@
 from .layout import Layout, Schema, Validation
-from .operations import Position, SimpleOperation
+from .operations import Position, TwoOperandsOperation
 from .sheet import Sheet
 
 __all__ = [
@@ -7,6 +7,6 @@ __all__ = [
     "Position",
     "Schema",
     "Sheet",
-    "SimpleOperation",
+    "TwoOperandsOperation",
     "Validation",
 ]

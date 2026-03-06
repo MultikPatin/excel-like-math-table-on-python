@@ -10,7 +10,7 @@ class Position:
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class SimpleOperation:
+class TwoOperandsOperation:
     first_operand: Position
     second_operand: Position
     operation: OperationEnum
