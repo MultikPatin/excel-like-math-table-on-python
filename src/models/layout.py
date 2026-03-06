@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from functools import cached_property
 from typing import Any
 
 from src.enums.layout import LayoutDataTypeEnum
@@ -37,7 +36,7 @@ class Layout:
             )
             raise ValueError(msg)
 
-    @cached_property
+    @property
     def columns(self) -> int:
         return len(self.schemas)
 

@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from functools import cached_property
 
 from src._types import AnyMatrix
 
@@ -16,14 +15,14 @@ class Sheet:
             msg = "Sheet must contain at least 1 column"
             raise ValueError(msg)
 
-    @cached_property
+    @property
     def shape(self) -> tuple[int, int]:
         return self.rows, self.columns
 
-    @cached_property
+    @property
     def rows(self) -> int:
         return len(self.matrix)
 
-    @cached_property
+    @property
     def columns(self) -> int:
         return len(self.matrix[0])

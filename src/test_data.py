@@ -24,32 +24,38 @@ pos33 = Position(row_idx=3, col_idx=3)
 
 operations = [
     TwoOperandsOperation(
-        first_operand=pos00,
-        second_operand=pos10,
+        left=pos00,
+        right=pos10,
+        operation=OperationEnum.ADD,
+        result=pos20,
+    ),
+    TwoOperandsOperation(
+        left=pos20,
+        right=pos01,
         operation=OperationEnum.ADD,
         result=pos30,
     ),
     TwoOperandsOperation(
-        first_operand=pos01,
-        second_operand=pos11,
+        left=pos01,
+        right=pos11,
         operation=OperationEnum.MUL,
         result=pos31,
     ),
     TwoOperandsOperation(
-        first_operand=pos02,
-        second_operand=pos12,
+        left=pos02,
+        right=pos12,
         operation=OperationEnum.MUL,
         result=pos32,
     ),
     TwoOperandsOperation(
-        first_operand=pos30,
-        second_operand=pos31,
+        left=pos30,
+        right=pos31,
         operation=OperationEnum.MUL,
         result=pos02,
     ),
     TwoOperandsOperation(
-        first_operand=pos01,
-        second_operand=pos11,
+        left=pos01,
+        right=pos11,
         operation=OperationEnum.SUB,
         result=pos22,
     ),

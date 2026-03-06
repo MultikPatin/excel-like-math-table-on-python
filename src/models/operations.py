@@ -11,15 +11,15 @@ class Position:
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class TwoOperandsOperation:
-    first_operand: Position
-    second_operand: Position
+    left: Position
+    right: Position
     operation: OperationEnum
     result: Position
 
     def __post_init__(self) -> None:
-        if self.first_operand == self.second_operand:
+        if self.left == self.right:
             msg = (
                 f"Cannot have both operands at the same position: "
-                f"first={self.first_operand}, second={self.second_operand}"
+                f"first={self.left}, second={self.right}"
             )
             raise ValueError(msg)
