@@ -8,13 +8,16 @@ class Position:
     row_idx: int
     col_idx: int
 
+    def dump(self) -> tuple[int, int]:
+        return self.row_idx, self.col_idx
+
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class TwoOperandsOperation:
     left: Position
     right: Position
     operation: OperationEnum
-    result: Position
+    target: Position
 
     def __post_init__(self) -> None:
         if self.left == self.right:

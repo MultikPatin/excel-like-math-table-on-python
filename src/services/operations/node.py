@@ -1,4 +1,5 @@
-from src.constants import INDENT_CHAR
+from typing import Any
+
 from src.enums import OperationEnum
 from src.models import Position
 
@@ -58,10 +59,18 @@ class Node:
         self._right = right
         # print("Set right")
 
-    def dump(self, indent: int = 0) -> str:
-        target = f"Cell [{self._target.row_idx}, {self._target.col_idx}] "
-        operation = f"{self._operation.name}\n" if self._operation else "\n"
-        left = self._left.dump(indent + 2) if self._left else ""
-        right = self._right.dump(indent + 2) if self._right else ""
+    def dump(self) -> dict[str, Any] | tuple[int, int]:
+        result = {}
 
-        return INDENT_CHAR * indent + target + operation + left + right
+        if self._operation:
+            result["operation"] = self._operation
+        if self._left:
+            result["left"] = self._left.dump()
+        if self._right:
+            result["right"] = self._right.dump()
+
+        if result:
+            result["target"] = self._target.dump()
+            return result
+
+        return self._target.dump()

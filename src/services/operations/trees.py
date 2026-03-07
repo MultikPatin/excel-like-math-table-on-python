@@ -1,3 +1,5 @@
+from typing import Any
+
 from src.models import Position, TwoOperandsOperation
 
 from .node import Node
@@ -5,36 +7,33 @@ from .node import Node
 
 class OperationTree:
     def __init__(self) -> None:
-        self._trees: dict[Position, Node] = {}
         self._targets: dict[Position, Node] = {}
 
-    def dump(self) -> str:
-        result = "Trees are an operation in a table\n"
-
-        for position in self._trees.values():
-            result += "=================================\n"
-            result += position.dump()
-
-        return result
+    def dump(self) -> list[dict[str, Any] | tuple[int, int]]:
+        return [
+            target.dump()
+            for target in self._targets.values()
+            if target.operation is not None
+        ]
 
     def add_two_operands(self, opr: TwoOperandsOperation) -> None:
-        left = self._targets.get(opr.left, Node(opr.left))
-        right = self._targets.get(opr.right, Node(opr.right))
+        left = self._targets.get(opr.left)
+        if not left:
+            self._targets[opr.left] = Node(opr.left)
 
-        result = self._targets.get(opr.result)
-        if not result:
-            result = Node(
-                opr.result,
+        right = self._targets.get(opr.right)
+        if not right:
+            self._targets[opr.right] = Node(opr.right)
+
+        target = self._targets.get(opr.target)
+        if not target:
+            self._targets[opr.target] = Node(
+                opr.target,
                 operation=opr.operation,
-                left=left,
-                right=right,
+                left=self._targets[opr.left],
+                right=self._targets[opr.right],
             )
-            self._targets[opr.result] = result
-            self._trees[opr.result] = result
         else:
-            result.operation = opr.operation
-            result.left = left
-            result.right = right
-
-        self._targets[opr.left] = result
-        self._targets[opr.right] = result
+            target.operation = opr.operation
+            target.left = self._targets[opr.left]
+            target.right = self._targets[opr.right]
