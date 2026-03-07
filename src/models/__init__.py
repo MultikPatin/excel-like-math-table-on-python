@@ -1,12 +1,11 @@
-from .layout import Layout, Schema, Validation
+from .layout import Layout, Schema
 from .operations import Position, TwoOperandsOperation
-from .sheet import Sheet
+from .table import Table
 
 __all__ = [
     "Layout",
     "Position",
     "Schema",
-    "Sheet",
+    "Table",
     "TwoOperandsOperation",
-    "Validation",
 ]

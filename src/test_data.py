@@ -1,19 +1,27 @@
 from src.enums.layout import LayoutDataTypeEnum
 from src.enums.operations import OperationEnum
-from src.models import Layout, Position, Schema, Sheet, TwoOperandsOperation
+from src.models import Layout, Position, Schema, TwoOperandsOperation
 
 _ROWS_COUNT: int = 4
 _COLS_COUNT: int = 5
 _SCHEMA_COUNT: int = 5
 
-_matrix = [[0 for _ in range(_COLS_COUNT)] for _ in range(_ROWS_COUNT)]
-sheet = Sheet(matrix=_matrix)
+# Values
 
-_schemas = [
-    Schema(key=f"col {j}", type=LayoutDataTypeEnum.integer)
-    for j in range(_SCHEMA_COUNT)
+values: list[list[int]] = [
+    [(i * 10 + j) for j in range(_COLS_COUNT)] for i in range(_ROWS_COUNT)
 ]
-layout = Layout(schemas=_schemas)
+
+# Layout
+
+layout = Layout(
+    schemas=[
+        Schema(key=f"col {j}", type=LayoutDataTypeEnum.integer)
+        for j in range(_SCHEMA_COUNT)
+    ]
+)
+
+# Operations
 
 _operations = [
     [Position(row_idx=i, col_idx=j) for j in range(_COLS_COUNT)]

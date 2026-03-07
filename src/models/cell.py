@@ -1,7 +1,8 @@
 from collections.abc import Callable
+from typing import Self
 
-type Formula = Callable | None
 type Cells = list[Cell]
+type Formula = Callable | None
 
 
 class Cell[T]:
@@ -13,15 +14,16 @@ class Cell[T]:
         self._formula: Formula = None
         self._dependencies: Cells = []
 
+    @classmethod
+    def create_empty(cls) -> Self:
+        return cls()
+
     @property
     def value(self) -> T | None:
         return self._value
 
-    @property
-    def dependents(self) -> Cells:
-        return self._dependents
-
-    def set_value(self, value: T) -> None:
+    @value.setter
+    def value(self, value: T) -> None:
         self._value = value
         self._recalculate_depends()
 
@@ -42,12 +44,12 @@ class Cell[T]:
     def _link_dependents(self, dependencies: Cells) -> None:
         self._dependencies = dependencies
         for d in self._dependencies:
-            d.dependents.append(self)
+            d._dependents.append(self)
 
     def _unlink_dependents(self) -> None:
         for d in self._dependencies:
-            if self in d.dependents:
-                d.dependents.remove(self)
+            if self in d._dependents:
+                d._dependents.remove(self)
 
     def _recalculate_depends(self) -> None:
         for d in self._dependents:
