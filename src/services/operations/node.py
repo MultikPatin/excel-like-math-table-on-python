@@ -33,7 +33,6 @@ class Node:
             msg = "Operation already set"
             raise ValueError(msg)
         self._operation = operation
-        # print("Set operation")
 
     @property
     def left(self) -> MaybeNode | None:
@@ -45,7 +44,6 @@ class Node:
             msg = "Left node is equal to target node "
             raise ValueError(msg)
         self._left = left
-        # print("Set left")
 
     @property
     def right(self) -> MaybeNode | None:
@@ -57,7 +55,6 @@ class Node:
             msg = "Right node is equal to target node "
             raise ValueError(msg)
         self._right = right
-        # print("Set right")
 
     def dump(self) -> dict[str, Any] | tuple[int, int]:
         result = {}
@@ -68,7 +65,6 @@ class Node:
             result["left"] = self._left.dump()
         if self._right:
             result["right"] = self._right.dump()
-
         if result:
             result["target"] = self._target.dump()
             return result
