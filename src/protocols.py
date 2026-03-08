@@ -1,4 +1,4 @@
-from collections.abc import Callable
+from collections.abc import Callable, MutableSequence
 from typing import Any, Protocol, Self
 
 
@@ -26,6 +26,8 @@ class CellProtocol[T](Protocol):
     @value.setter
     def value(self, value: T) -> None: ...
     def set_formula(
-        self, formula: Callable | None, dependencies: "list[CellProtocol]"
+        self,
+        formula: Callable | None,
+        dependencies: "MutableSequence[CellProtocol]",
     ) -> None: ...
     def recalculate(self) -> None: ...

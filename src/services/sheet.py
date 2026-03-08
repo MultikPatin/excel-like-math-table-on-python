@@ -1,4 +1,4 @@
-from collections.abc import Sequence
+from collections.abc import Callable, MutableSequence, Sequence
 from typing import Any
 
 from src.protocols import CellProtocol, TableProtocol
@@ -34,8 +34,20 @@ class Sheet:
         return len(self._sheet[0])
 
     def set_value(self, row: int, col: int, value: Any) -> None:  # noqa: ANN401
+        self._cell(row, col).value = value
+
+    def set_formula(
+        self,
+        row: int,
+        col: int,
+        formula: Callable,
+        dependencies: MutableSequence[CellProtocol],
+    ) -> None:
+        self._cell(row, col).set_formula(formula, dependencies)
+
+    def _cell(self, row: int, col: int) -> CellProtocol:
         try:
-            self._sheet[row][col].value = value
+            return self._sheet[row][col]
         except IndexError:
             msg = (
                 f"Index out of range. Table shape: {self.shape}. "
