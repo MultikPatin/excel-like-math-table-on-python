@@ -1,7 +1,7 @@
-from collections.abc import Callable
+from collections.abc import Callable, MutableSequence
 from typing import Self
 
-type Cells = list[Cell]
+type Cells = MutableSequence[Cell]
 type Formula = Callable | None
 
 

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Any
 
-from src.enums.layout import LayoutDataTypeEnum
+from src.enums import LayoutDataTypeEnum
 from src.protocols import TableProtocol
 
 

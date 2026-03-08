@@ -1,7 +1,6 @@
 from icecream import ic
 
-from src.models import Table
-from src.models.cell import Cell
+from src.models import Cell, Table
 from src.services import Sheet
 from src.test_data import values
 

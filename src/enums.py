@@ -1,4 +1,4 @@
-from enum import StrEnum, auto
+from enum import Enum, StrEnum, auto
 
 
 class LayoutDataTypeEnum(StrEnum):
@@ -9,3 +9,10 @@ class LayoutDataTypeEnum(StrEnum):
     # date = auto()
     # time = auto()
     # datetime = auto()
+
+
+class OperationEnum(Enum):
+    ADD = "+"
+    SUB = "-"
+    MUL = "*"
+    DIV = "/"

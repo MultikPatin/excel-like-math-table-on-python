@@ -9,7 +9,7 @@ class TableProtocol(Protocol):
     def rows(self) -> int: ...
     @property
     def columns(self) -> int: ...
-    def get_value(self, row_idx: int, col_idx: int) -> Any: ...  # noqa: ANN401
+    def get_value(self, row: int, col: int) -> Any: ...  # noqa: ANN401
 
 
 # class LayoutProtocol(Protocol):
@@ -26,6 +26,6 @@ class CellProtocol[T](Protocol):
     @value.setter
     def value(self, value: T) -> None: ...
     def set_formula(
-        self, formula: Callable | None, dependencies: "CellProtocol"
+        self, formula: Callable | None, dependencies: "list[CellProtocol]"
     ) -> None: ...
     def recalculate(self) -> None: ...

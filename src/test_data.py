@@ -1,5 +1,4 @@
-from src.enums.layout import LayoutDataTypeEnum
-from src.enums.operations import OperationEnum
+from src.enums import LayoutDataTypeEnum, OperationEnum
 from src.models import Layout, Position, Schema, TwoOperandsOperation
 
 _ROWS_COUNT: int = 4
