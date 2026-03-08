@@ -1,6 +1,6 @@
 from typing import Any
 
-from src.models import Position, TwoOperandsOperation
+from src.domains import Position, TwoOperandsOperation
 
 from .node import Node
 

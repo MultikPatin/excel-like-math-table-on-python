@@ -1,6 +1,6 @@
 from icecream import ic
 
-from src.models import Cell, Table
+from src.domains import cell, table
 from src.services import Sheet
 from src.test_data import values
 
@@ -14,6 +14,8 @@ if __name__ == "__main__":
     #     ic("================================================================")
     #     ic(operation)
 
-    sheet = Sheet(table=Table(values=values), cell=Cell())  # ty:ignore[invalid-argument-type]
+    sheet = Sheet(new_table=table.Model(values=values), cell_cls=cell.Model())
 
     ic(1)
+    values = sheet.get_table()
+    ic(values)

@@ -1,7 +1,7 @@
 from typing import Any
 
+from src.domains import Position
 from src.enums import OperationEnum
-from src.models import Position
 
 type MaybeNode = Node | None
 

@@ -1,5 +1,5 @@
+from src.domains import Layout, Position, Schema, TwoOperandsOperation
 from src.enums import LayoutDataTypeEnum, OperationEnum
-from src.models import Layout, Position, Schema, TwoOperandsOperation
 
 _ROWS_COUNT: int = 4
 _COLS_COUNT: int = 5
