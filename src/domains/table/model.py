@@ -1,26 +1,22 @@
-from typing import TYPE_CHECKING, Any
+from dataclasses import dataclass
+from typing import Any
 
+from ._types import TypeTableValues
 from .exceptions import (
     InvalidColumnCountError,
     InvalidIndexError,
     InvalidRowCountError,
 )
 
-if TYPE_CHECKING:
-    from ._types import Values
 
+@dataclass(frozen=True, slots=True, kw_only=True)
+class Table[T]:
+    values: TypeTableValues[T]
 
-class Model:
-    __slots__ = ("_values",)
-
-    def __init__(self, values: "Values") -> None:
-        self._values = values
-        self._init_validate()
-
-    def _init_validate(self) -> None:
-        if len(self._values) < 1:
+    def __post_init__(self) -> None:
+        if len(self.values) < 1:
             raise InvalidRowCountError
-        if len(self._values[0]) < 1:
+        if len(self.values[0]) < 1:
             raise InvalidColumnCountError
 
     @property
@@ -29,24 +25,20 @@ class Model:
 
     @property
     def rows(self) -> int:
-        return len(self._values)
+        return len(self.values)
 
     @property
     def columns(self) -> int:
-        return len(self._values[0])
-
-    @property
-    def values(self) -> "Values":
-        return self._values
+        return len(self.values[0])
 
     def get_value(self, row: int, col: int) -> Any:  # noqa: ANN401
         try:
-            return self._values[row][col]
+            return self.values[row][col]
         except IndexError as e:
             raise InvalidIndexError(row, col, self) from e
 
     def set_value(self, row: int, col: int, value: Any) -> None:  # noqa: ANN401
         try:
-            self._values[row][col] = value
+            self.values[row][col] = value
         except IndexError as e:
             raise InvalidIndexError(row, col, self) from e

@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .port import Port
+    from .model import Table
 
 
 class DomainError(Exception):
@@ -22,6 +22,6 @@ class InvalidColumnCountError(DomainError):
 
 
 class InvalidIndexError(DomainError):
-    def __init__(self, row: int, col: int, table: "Port") -> None:
+    def __init__(self, row: int, col: int, table: "Table") -> None:
         msg = f"Actual shape: {table.shape}. Requested ({row}, {col})"
         super().__init__(msg)

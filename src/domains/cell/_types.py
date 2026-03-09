@@ -1,7 +1,7 @@
 from collections.abc import Callable, MutableSequence
 
-from .port import Port
+from .model import Cell
 
-type TypeCellDependencies = MutableSequence[Port]
-type TypeCellDependents = MutableSequence[Port]
+type TypeCellDependencies = MutableSequence[Cell]
+type TypeCellDependents = MutableSequence[Cell]
 type TypeFormula = Callable | None

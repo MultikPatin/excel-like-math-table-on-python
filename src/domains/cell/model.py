@@ -1,10 +1,10 @@
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ._types import TypeCellDependencies, TypeCellDependents, TypeFormula
 
 
-class Model[T]:
+class Cell[T]:
     __slots__ = (
         "_col",
         "_dependencies",
@@ -23,10 +23,6 @@ class Model[T]:
         self._dependents: TypeCellDependents = []
         self._formula: TypeFormula = None
         self._dependencies: TypeCellDependencies = []
-
-    @classmethod
-    def new(cls, row: int, col: int) -> Self:
-        return cls(row, col)
 
     @property
     def value(self) -> T | None:

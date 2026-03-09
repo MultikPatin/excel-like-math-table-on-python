@@ -1,10 +1,8 @@
 from ._types import TypeCellDependencies, TypeCellDependents, TypeFormula
-from .model import Model
-from .port import Port
+from .model import Cell
 
 __all__ = [
-    "Model",
-    "Port",
+    "Cell",
     "TypeCellDependencies",
     "TypeCellDependents",
     "TypeFormula",

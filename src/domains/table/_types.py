@@ -1,3 +1,1 @@
-from typing import Any
-
-type Values = list[list[Any]]
+type TypeTableValues[T] = list[list[T]]

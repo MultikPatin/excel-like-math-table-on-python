@@ -1,17 +1,15 @@
-from ._types import Values
+from ._types import TypeTableValues
 from .exceptions import (
     InvalidColumnCountError,
     InvalidIndexError,
     InvalidRowCountError,
 )
-from .model import Model
-from .port import Port
+from .model import Table
 
 __all__ = [
     "InvalidColumnCountError",
     "InvalidIndexError",
     "InvalidRowCountError",
-    "Model",
-    "Port",
-    "Values",
+    "Table",
+    "TypeTableValues",
 ]
