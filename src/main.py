@@ -1,9 +1,16 @@
 from icecream import ic
 
 from src.services import Parser, Sheet, Tokenizer
-from src.test_data import values
+
+_ROWS_COUNT: int = 4
+_COLS_COUNT: int = 5
+_SCHEMA_COUNT: int = 5
 
 if __name__ == "__main__":
+    values: list[list[int]] = [
+        [(i * 10 + j) for j in range(_COLS_COUNT)] for i in range(_ROWS_COUNT)
+    ]
+
     sheet = Sheet(values)
 
     ic(1)

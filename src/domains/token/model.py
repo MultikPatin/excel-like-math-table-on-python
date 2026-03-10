@@ -9,6 +9,13 @@ from .enums import (
     TypeEnum,
     get_all_operators,
 )
+from .exceptions import (
+    InvalidCellValueError,
+    InvalidFunctionValueError,
+    InvalidNumberValueError,
+    InvalidOperatorValueError,
+    InvalidValueError,
+)
 
 type TypeValue = (
     FirstLevelOperatorsEnum
@@ -42,44 +49,28 @@ class Token:
         if self.value is not None:
             match self.type:
                 case TypeEnum.NUMBER:
-                    _ = (
-                        float(self.value)
-                        if FormulaCharsEnum.DOT in self.value
-                        else int(self.value)
-                    )
+                    try:
+                        _ = (
+                            float(self.value)
+                            if FormulaCharsEnum.DOT in self.value
+                            else int(self.value)
+                        )
+                    except Exception as e:
+                        raise InvalidNumberValueError(self.value) from e
                 case TypeEnum.OPERATOR:
                     operators = get_all_operators()
-
                     if self.value not in operators:
-                        # TODO Custom exception!
-                        msg = (
-                            f"Operator must be one of: {operators},"
-                            f" but got {self.value}"
-                        )
-                        raise ValueError(msg)
+                        raise InvalidOperatorValueError(self.value, operators)
                 case TypeEnum.FUNCTION:
                     functions = FunctionsEnum.values_set()
-
                     if self.value not in functions:
-                        # TODO Custom exception!
-                        msg = (
-                            f"Operator must be one of: {functions}"
-                            f" but got {self.value}"
-                        )
-                        raise ValueError(msg)
+                        raise InvalidFunctionValueError(self.value, functions)
                 case TypeEnum.CELL:
                     if not _CELL_PATTERN.match(self.value):
-                        # TODO Custom exception!
-                        msg = (
-                            f"Cell name must be in format [A-Z]+[0-9]+, "
-                            f"e.g. A1, ABC123, but got '{self.value}'"
-                        )
-                        raise ValueError(msg)
+                        raise InvalidCellValueError(self.value, _CELL_PATTERN)
 
         elif self.type != TypeEnum.EOF:
-            # TODO Custom exception!
-            msg = f"Value cannot be 'None' if type is {self.type}"
-            raise ValueError(msg)
+            raise InvalidValueError
 
     def is_type_operator(self) -> bool:
         return self.type == TypeEnum.OPERATOR
