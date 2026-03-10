@@ -1,7 +1,8 @@
-from typing import TYPE_CHECKING
+from collections.abc import Callable, MutableSequence
 
-if TYPE_CHECKING:
-    from ._types import TypeCellDependencies, TypeCellDependents, TypeFormula
+type TypeCellDependencies = MutableSequence[Cell]
+type TypeCellDependents = MutableSequence[Cell]
+type TypeFormula = Callable | None
 
 
 class Cell[T]:

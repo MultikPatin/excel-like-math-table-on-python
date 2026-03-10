@@ -1,4 +1,4 @@
-from .formula import Tokenizer
+from .formula import Parser, Tokenizer
 from .sheet import Sheet
 
-__all__ = ["Sheet", "Tokenizer"]
+__all__ = ["Parser", "Sheet", "Tokenizer"]

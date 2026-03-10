@@ -1,12 +1,13 @@
 from dataclasses import dataclass
 from typing import Any
 
-from ._types import TypeTableValues
 from .exceptions import (
     InvalidColumnCountError,
     InvalidIndexError,
     InvalidRowCountError,
 )
+
+type TypeTableValues[T] = list[list[T]]
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)

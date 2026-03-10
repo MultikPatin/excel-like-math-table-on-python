@@ -1,3 +1,4 @@
+from .parser import Parser
 from .tokenizer import Tokenizer
 
-__all__ = ["Tokenizer"]
+__all__ = ["Parser", "Tokenizer"]

@@ -1,6 +1,14 @@
-from src.comstants import DOT_CHAR, EQUALITY_CHAR
-from src.domains.char import Char
-from src.domains.token import Token, TypeEnum, TypeValue
+from src.domains.token import (
+    FirstLevelOperatorsEnum,
+    FormulaCharsEnum,
+    FunctionsEnum,
+    SecondLevelOperatorsEnum,
+    Token,
+    TypeEnum,
+    TypeValue,
+)
+
+from .char import Char
 
 
 class Tokenizer:
@@ -18,7 +26,9 @@ class Tokenizer:
         self._tokens: list[Token] = []
 
     def _sanitize_text(self, text: str) -> None:
-        self._text = text[1:] if text.startswith(EQUALITY_CHAR) else text
+        self._text = (
+            text[1:] if text.startswith(FormulaCharsEnum.EQUALITY) else text
+        )
 
     def _in_range(self) -> bool:
         return self._cursor < len(self._text)
@@ -29,13 +39,36 @@ class Tokenizer:
     def _set_token(
         self,
         type_: TypeEnum,
-        value: TypeValue,
+        value: str | None = None,
         position: int | None = None,
     ) -> None:
         if position is None:
             position = self._cursor
+        if value is not None:
+            value = self._sanitize_token_value(type_, value)
 
         self._tokens.append(Token(type=type_, value=value, position=position))
+
+    @staticmethod
+    def _sanitize_token_value(type_: TypeEnum, value: str) -> TypeValue:
+        result = None
+
+        if type_ == TypeEnum.OPERATOR:
+            if value in FirstLevelOperatorsEnum:
+                result = FirstLevelOperatorsEnum(value)
+            elif value in SecondLevelOperatorsEnum:
+                result = SecondLevelOperatorsEnum(value)
+        elif type_ in (TypeEnum.NUMBER, TypeEnum.CELL):
+            result = value
+        elif type_ == TypeEnum.FUNCTION:
+            if value in FunctionsEnum:
+                result = FunctionsEnum(value)
+        else:
+            # TODO Custom exception!
+            msg = f"Invalid value '{value}'for type '{type_}'"
+            raise SyntaxError(msg)
+
+        return result
 
     def tokenize(self, text: str) -> list[Token]:
         self._reset(text)
@@ -61,30 +94,30 @@ class Tokenizer:
                 continue
 
             if char.islparent():
-                self._set_token(TypeEnum.LPAREN, char)
+                self._set_token(TypeEnum.LPAREN)
                 self._cursor += 1
                 continue
 
             if char.isrparent():
-                self._set_token(TypeEnum.RPAREN, char)
+                self._set_token(TypeEnum.RPAREN)
                 self._cursor += 1
                 continue
 
             if char.iscomma():
-                self._set_token(TypeEnum.COMMA, char)
+                self._set_token(TypeEnum.COMMA)
                 self._cursor += 1
                 continue
 
             if char.iscolon():
-                self._set_token(TypeEnum.COLON, char)
+                self._set_token(TypeEnum.COLON)
                 self._cursor += 1
                 continue
 
-            msg = f"Неожиданный символ '{char}' на позиции {self._cursor}"
-            # Custom exception!
+            msg = f"Unexpected character '{char}' at position {self._cursor}"
+            # TODO Custom exception!
             raise SyntaxError(msg)
 
-        self._set_token(TypeEnum.EOF, None)
+        self._set_token(TypeEnum.EOF)
         return self._tokens
 
     def _parse_number(self) -> None:
@@ -93,10 +126,9 @@ class Tokenizer:
         while self._in_range() and self._peek().isnumber():
             self._cursor += 1
 
-        sub = self._text[position : self._cursor]
-
-        value = float(sub) if DOT_CHAR in sub else int(sub)
-        self._set_token(TypeEnum.NUMBER, value, position)
+        self._set_token(
+            TypeEnum.NUMBER, self._text[position : self._cursor], position
+        )
 
     def _parse_identifier(self) -> None:
         position = self._cursor

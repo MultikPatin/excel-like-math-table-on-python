@@ -1,8 +1,9 @@
 from typing import Any
 
-from src.domains.cell import Cell, TypeCellDependencies, TypeFormula
 from src.domains.table import Table, TypeTableValues
 from src.domains.token import TypeValue
+
+from .cell import Cell, TypeCellDependencies, TypeFormula
 
 
 class Sheet:
@@ -43,5 +44,5 @@ class Sheet:
             msg = (
                 f"Index out of range. Table shape: {shape}. "
                 f"Requested row: {row}, column: {col}"
-            )  # Set custom exception
+            )  # TODO Set custom exception
             raise ValueError(msg)  # noqa: B904
