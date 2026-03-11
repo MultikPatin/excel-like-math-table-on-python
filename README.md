@@ -2,7 +2,7 @@
 
 ![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![Uv](https://img.shields.io/badge/Uv-0.10.7-FFD43B?style=for-the-badge&logo=uv&logoColor=black)
-![Ruff](https://img.shields.io/badge/Ruff-0.15.4-FB8B24?style=for-the-badge&logo=ruff&logoColor=white)
+![Ruff](https://img.shields.io/badge/Ruff-0.15.5-FB8B24?style=for-the-badge&logo=ruff&logoColor=white)
 ![Ty](https://img.shields.io/badge/Ty-0.0.21-2A6DB2?style=for-the-badge&logo=mypy&logoColor=white)
 ![Pre-commit](https://img.shields.io/badge/Pre--commit-4.5.1-FAB040?style=for-the-badge&logo=precommit&logoColor=white)
 
@@ -40,7 +40,7 @@ src/
     ├── domains/ # Модели данных (Token, AST и т.д.)
     ├── services/ # Логика: токенизатор, парсер, вычислитель
     ├── main. py # Точка входа и пример использования 
-    ├──tests/
+    ├── tests/
 ```
 
 ---

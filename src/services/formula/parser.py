@@ -1,31 +1,36 @@
+from collections.abc import Callable
+
+from src.domains.node import (
+    ASTNode,
+    BinaryOpNode,
+    FunctionNode,
+    LetterNode,
+    NumberNode,
+    RangeNode,
+)
 from src.domains.token import (
-    FirstLevelOperatorsEnum,
-    FunctionsEnum,
-    SecondLevelOperatorsEnum,
+    FirstPriorityOperatorsEnum,
+    SecondPriorityOperatorsEnum,
     Token,
     TypeEnum,
     TypeValue,
 )
 
-from .nodes import (
-    ASTNode,
-    BinaryOpNode,
-    CellNode,
-    FunctionNode,
-    NumberNode,
-    RangeNode,
+INVALID_TYPE = "Invalid token value type, received: {type}"
+type OperatorEnumType = (
+    type[FirstPriorityOperatorsEnum] | type[SecondPriorityOperatorsEnum]
 )
-
-INVALID_TOKEN_VALUE_TYPE = "Invalid token value type, received: {type}"  # noqa: S105
 
 
 class Parser:
+    __slots__ = ["_position", "_tokens"]
+
     def __init__(self) -> None:
-        self.position = 0
+        self._position = 0
         self._tokens: list[Token] = []
 
     def parse(self, tokens: list[Token]) -> ASTNode:
-        self.position = 0
+        self._position = 0
         self._tokens = tokens
         ast = self._parse_expression()
         self._expect(TypeEnum.EOF, inc_position=False)
@@ -34,64 +39,50 @@ class Parser:
     def _parse_expression(self) -> ASTNode:
         return self._parse_second_level_operators()
 
-    def _parse_second_level_operators(self) -> ASTNode:
-        left = self._parse_first_level_operators()
+    def _parse_operators(
+        self, func: Callable[[], ASTNode], enum: OperatorEnumType
+    ) -> ASTNode:
+        left = func()
 
         while self._peek().is_type_operator():
             op = self._peek_value()
-            if op in SecondLevelOperatorsEnum:
-                self.position += 1
-                right = self._parse_first_level_operators()
-                left = BinaryOpNode(left, SecondLevelOperatorsEnum(op), right)
+            if op in enum:
+                self._position += 1
+                right = func()
+                left = BinaryOpNode(left=left, op=op, right=right)
             else:
                 break
 
         return left
+
+    def _parse_second_level_operators(self) -> ASTNode:
+        return self._parse_operators(
+            self._parse_first_level_operators,
+            SecondPriorityOperatorsEnum,
+        )
 
     def _parse_first_level_operators(self) -> ASTNode:
-        left = self._parse_elements()
-
-        while self._peek().is_type_operator():
-            op = self._peek_value()
-            if op in FirstLevelOperatorsEnum:
-                self.position += 1
-                right = self._parse_elements()
-                left = BinaryOpNode(left, FirstLevelOperatorsEnum(op), right)
-            else:
-                break
-
-        return left
+        return self._parse_operators(
+            self._parse_elements,
+            FirstPriorityOperatorsEnum,
+        )
 
     def _parse_elements(self) -> ASTNode:
         token = self._peek()
 
         if token.is_type_number():
-            self.position += 1
-
-            if not isinstance(token.value, str):
-                # TODO Custom exception!
-                raise SyntaxError(
-                    INVALID_TOKEN_VALUE_TYPE.format(type=type(token.value))
-                )
-
-            return NumberNode(token.value)
+            self._position += 1
+            return NumberNode(value=token.value)
 
         if token.is_type_cell():
-            self.position += 1
-
-            if not isinstance(token.value, str):
-                # TODO Custom exception!
-                raise SyntaxError(
-                    INVALID_TOKEN_VALUE_TYPE.format(type=type(token.value))
-                )
-
-            return CellNode(token.value)
+            self._position += 1
+            return LetterNode(letter=token.value)
 
         if token.is_type_function():
             return self._parse_function()
 
         if token.is_type_lparen():
-            self.position += 1
+            self._position += 1
             expr = self._parse_expression()
             self._expect(TypeEnum.RPAREN)
             return expr
@@ -102,7 +93,7 @@ class Parser:
 
     def _parse_function(self) -> FunctionNode:
         function = self._peek_value()
-        self.position += 1
+        self._position += 1
         self._expect(TypeEnum.LPAREN)
 
         args = []
@@ -111,52 +102,34 @@ class Parser:
             while True:
                 if self._is_range_start():
                     start = self._peek_value()
-                    if not isinstance(start, str):
-                        # TODO Custom exception!
-                        raise SyntaxError(
-                            INVALID_TOKEN_VALUE_TYPE.format(type=type(start))
-                        )
-                    self.position += 1
+                    self._position += 1
 
                     self._expect(TypeEnum.COLON)
 
                     end = self._peek_value()
-                    if not isinstance(end, str):
-                        # TODO Custom exception!
-                        raise SyntaxError(
-                            INVALID_TOKEN_VALUE_TYPE.format(type=type(end))
-                        )
-                    self.position += 1
+                    self._position += 1
 
-                    args.append(RangeNode(start, end))
+                    args.append(RangeNode(start=start, end=end))
                 else:
                     args.append(self._parse_expression())
 
                 if self._peek().is_type_comma():
-                    self.position += 1
+                    self._position += 1
                     continue
                 break
 
         self._expect(TypeEnum.RPAREN)
-
-        if isinstance(function, FunctionsEnum):
-            return FunctionNode(function, args)
-
-        # TODO Custom exception!
-        raise SyntaxError(INVALID_TOKEN_VALUE_TYPE.format(type=type(function)))
+        return FunctionNode(function=function, args=args)
 
     def _peek(self) -> Token:
-        return self._tokens[self.position]
-
-    def _peek_type(self) -> TypeEnum:
-        return self._peek().type
+        return self._tokens[self._position]
 
     def _peek_value(self) -> TypeValue:
         return self._peek().value
 
     def _peek_next(self) -> Token | None:
-        if self.position + 1 < len(self._tokens):
-            return self._tokens[self.position + 1]
+        if self._position + 1 < len(self._tokens):
+            return self._tokens[self._position + 1]
         return None
 
     def _is_range_start(self) -> bool:
@@ -173,5 +146,5 @@ class Parser:
             # TODO Custom exception!
             raise SyntaxError(msg)
         if inc_position:
-            self.position += 1
+            self._position += 1
         return self._peek()

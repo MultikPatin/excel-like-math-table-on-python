@@ -3,7 +3,7 @@ from .exceptions import (
     InvalidIndexError,
     InvalidRowCountError,
 )
-from .model import Table, TypeTableValues
+from .table import Table, TypeTableValues
 
 __all__ = [
     "InvalidColumnCountError",

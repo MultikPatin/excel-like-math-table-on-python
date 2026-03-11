@@ -1,7 +1,9 @@
-import re
-from typing import Any
+from typing import TYPE_CHECKING
 
-from src.domains.token import TypeEnum
+from .enums import get_all_operators
+
+if TYPE_CHECKING:
+    from re import Pattern
 
 
 class DomainError(Exception):
@@ -9,26 +11,20 @@ class DomainError(Exception):
         super().__init__(message)
 
 
-class InvalidValueError(DomainError):
-    def __init__(self) -> None:
-        msg = f"Value can be 'None' only if type is {TypeEnum.EOF}"
-        super().__init__(msg)
-
-
 class InvalidOperatorValueError(DomainError):
-    def __init__(self, value: Any, operators: set[str]) -> None:  # noqa: ANN401
-        msg = f"Operator must be one of: {operators}, but got {value}"
+    def __init__(self, value: str) -> None:
+        msg = f"Operator must be one of: {get_all_operators()}, but got {value}"
         super().__init__(msg)
 
 
 class InvalidFunctionValueError(DomainError):
-    def __init__(self, value: Any, functions: set[str]) -> None:  # noqa: ANN401
-        msg = f"Operator must be one of: {functions} but got {value}"
+    def __init__(self, value: str, functions: set[str]) -> None:
+        msg = f"Function must be one of: {functions} but got {value}"
         super().__init__(msg)
 
 
 class InvalidCellValueError(DomainError):
-    def __init__(self, value: Any, pattern: re.Pattern) -> None:  # noqa: ANN401
+    def __init__(self, value: str, pattern: "Pattern") -> None:
         msg = (
             f"Cell name must be in format {pattern}, "
             f"e.g. A1, ABC123, but got '{value}'"
@@ -37,6 +33,12 @@ class InvalidCellValueError(DomainError):
 
 
 class InvalidNumberValueError(DomainError):
-    def __init__(self, value: Any) -> None:  # noqa: ANN401
+    def __init__(self, value: str) -> None:
         msg = f"Number must convert to int or float, but got {value}"
+        super().__init__(msg)
+
+
+class InvalidFormulaCharValueError(DomainError):
+    def __init__(self, value: str, chars: set[str]) -> None:
+        msg = f"FormulaChar must be one of: {chars} but got {value}"
         super().__init__(msg)

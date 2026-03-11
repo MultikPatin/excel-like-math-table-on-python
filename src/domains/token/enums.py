@@ -1,7 +1,7 @@
 from enum import StrEnum
 
 
-class FirstLevelOperatorsEnum(StrEnum):
+class FirstPriorityOperatorsEnum(StrEnum):
     MUL = "*"
     DIV = "/"
 
@@ -10,7 +10,7 @@ class FirstLevelOperatorsEnum(StrEnum):
         return {item.value for item in cls}
 
 
-class SecondLevelOperatorsEnum(StrEnum):
+class SecondPriorityOperatorsEnum(StrEnum):
     ADD = "+"
     SUB = "-"
 
@@ -20,14 +20,15 @@ class SecondLevelOperatorsEnum(StrEnum):
 
 
 def get_all_operators() -> set[str]:
-    return FirstLevelOperatorsEnum.values_set().union(
-        SecondLevelOperatorsEnum.values_set()
+    return FirstPriorityOperatorsEnum.values_set().union(
+        SecondPriorityOperatorsEnum.values_set()
     )
 
 
 class FunctionsEnum(StrEnum):
-    SQRT = "SQRT"
     SUM = "SUM"
+    MAX = "MAX"
+    MIN = "MIN"
 
     @classmethod
     def values_set(cls) -> set[str]:
@@ -43,14 +44,18 @@ class FormulaCharsEnum(StrEnum):
     SEMICOLON = ";"
     EQUALITY = "="
 
+    @classmethod
+    def values_set(cls) -> set[str]:
+        return {item.value for item in cls}
+
 
 class TypeEnum(StrEnum):
     NUMBER = "NUMBER"
-    CELL = "CELL"
+    LETTER = "LETTER"
     FUNCTION = "FUNCTION"
     OPERATOR = "OPERATOR"
-    LPAREN = "LPAREN_CHAR"
-    RPAREN = "RPAREN_CHAR"
-    COMMA = "COMMA_CHAR"
-    COLON = "COLON_CHAR"
+    LPAREN = "LPAREN"
+    RPAREN = "RPAREN"
+    COMMA = "COMMA"
+    COLON = "COLON"
     EOF = "EOF"

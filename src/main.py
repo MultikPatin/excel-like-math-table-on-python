@@ -18,10 +18,25 @@ if __name__ == "__main__":
     ic(values)
 
     tokenizer = Tokenizer()
-    tokens = tokenizer.tokenize("=SQRT(SUM(A1:B3, C3) * 2.1 + C4) / B1")
+    parser = Parser()
+
+    tokens = tokenizer.tokenize("=SUM(A1:B3, MIN(A1:A3)")
     for token in tokens:
         ic(token)
 
-    parser = Parser()
+    ast = parser.parse(tokens)
+    ic(ast)
+
+    tokens = tokenizer.tokenize("=SUM(A1:B3, MIN(A1:A3)) * 2.1 + C4")
+    for token in tokens:
+        ic(token)
+
+    ast = parser.parse(tokens)
+    ic(ast)
+
+    tokens = tokenizer.tokenize("=SUM(A1:B3, C3) * 2.1 + C4 / B1 - MIN(A1:A3)")
+    for token in tokens:
+        ic(token)
+
     ast = parser.parse(tokens)
     ic(ast)

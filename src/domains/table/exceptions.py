@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .model import Table
+    from .table import Table
 
 
 class DomainError(Exception):

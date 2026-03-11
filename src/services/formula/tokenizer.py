@@ -1,14 +1,5 @@
-from src.domains.token import (
-    FirstLevelOperatorsEnum,
-    FormulaCharsEnum,
-    FunctionsEnum,
-    SecondLevelOperatorsEnum,
-    Token,
-    TypeEnum,
-    TypeValue,
-)
-
-from .char import Char
+from src._type import Char
+from src.domains.token import FormulaCharsEnum, Token, TypeEnum
 
 
 class Tokenizer:
@@ -44,31 +35,7 @@ class Tokenizer:
     ) -> None:
         if position is None:
             position = self._cursor
-        if value is not None:
-            value = self._sanitize_token_value(type_, value)
-
-        self._tokens.append(Token(type=type_, value=value, position=position))
-
-    @staticmethod
-    def _sanitize_token_value(type_: TypeEnum, value: str) -> TypeValue:
-        result = None
-
-        if type_ == TypeEnum.OPERATOR:
-            if value in FirstLevelOperatorsEnum:
-                result = FirstLevelOperatorsEnum(value)
-            elif value in SecondLevelOperatorsEnum:
-                result = SecondLevelOperatorsEnum(value)
-        elif type_ in (TypeEnum.NUMBER, TypeEnum.CELL):
-            result = value
-        elif type_ == TypeEnum.FUNCTION:
-            if value in FunctionsEnum:
-                result = FunctionsEnum(value)
-        else:
-            # TODO Custom exception!
-            msg = f"Invalid value '{value}'for type '{type_}'"
-            raise SyntaxError(msg)
-
-        return result
+        self._tokens.append(Token(type_=type_, value=value, position=position))
 
     def tokenize(self, text: str) -> list[Token]:
         self._reset(text)
@@ -94,22 +61,22 @@ class Tokenizer:
                 continue
 
             if char.islparent():
-                self._set_token(TypeEnum.LPAREN)
+                self._set_token(TypeEnum.LPAREN, char)
                 self._cursor += 1
                 continue
 
             if char.isrparent():
-                self._set_token(TypeEnum.RPAREN)
+                self._set_token(TypeEnum.RPAREN, char)
                 self._cursor += 1
                 continue
 
             if char.iscomma():
-                self._set_token(TypeEnum.COMMA)
+                self._set_token(TypeEnum.COMMA, char)
                 self._cursor += 1
                 continue
 
             if char.iscolon():
-                self._set_token(TypeEnum.COLON)
+                self._set_token(TypeEnum.COLON, char)
                 self._cursor += 1
                 continue
 
@@ -141,6 +108,6 @@ class Tokenizer:
         if sub.isupper() and self._in_range() and self._peek().islparent():
             type_ = TypeEnum.FUNCTION
         else:
-            type_ = TypeEnum.CELL
+            type_ = TypeEnum.LETTER
 
         self._set_token(type_, sub, position)
