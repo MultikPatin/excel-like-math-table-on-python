@@ -13,30 +13,86 @@ if __name__ == "__main__":
 
     sheet = Sheet(values)
 
-    ic(1)
     values = sheet.get_table()
     ic(values)
+    ic("-------------------------------------------------------")
 
     tokenizer = Tokenizer()
     parser = Parser()
 
-    tokens = tokenizer.tokenize("=SUM(A1:B3, MIN(A1:A3)")
+    # ============
+
+    tokens = tokenizer.tokenize("=A1 + A3")
     for token in tokens:
         ic(token)
 
     ast = parser.parse(tokens)
-    ic(ast)
+    dump = ast.dump()
+    ic(dump)
+    ic("-------------------------------------------------------")
 
-    tokens = tokenizer.tokenize("=SUM(A1:B3, MIN(A1:A3)) * 2.1 + C4")
+    # ============
+
+    tokens = tokenizer.tokenize("=A1 + A3 / 2.4")
     for token in tokens:
         ic(token)
 
     ast = parser.parse(tokens)
-    ic(ast)
+    dump = ast.dump()
+    ic(dump)
+    ic("-------------------------------------------------------")
+
+    # ============
+
+    tokens = tokenizer.tokenize("=MIN(A1:A3)")
+    for token in tokens:
+        ic(token)
+
+    ast = parser.parse(tokens)
+    dump = ast.dump()
+    ic(dump)
+    ic("-------------------------------------------------------")
+
+    # ============
+
+    tokens = tokenizer.tokenize("=SUM(A1:B3, C3)")
+    for token in tokens:
+        ic(token)
+
+    ast = parser.parse(tokens)
+    dump = ast.dump()
+    ic(dump)
+    ic("-------------------------------------------------------")
+
+    # ============
+
+    tokens = tokenizer.tokenize("=SUM(A1:B3, MIN(A1:A3))")
+    for token in tokens:
+        ic(token)
+
+    ast = parser.parse(tokens)
+    dump = ast.dump()
+    ic(dump)
+    ic("-------------------------------------------------------")
+
+    # ============
+
+    tokens = tokenizer.tokenize("=SUM(A1:B3, MAX(A1:A3)) / 2.1 + C4")
+    for token in tokens:
+        ic(token)
+
+    ast = parser.parse(tokens)
+    dump = ast.dump()
+    ic(dump)
+    ic("-------------------------------------------------------")
+
+    # ============
 
     tokens = tokenizer.tokenize("=SUM(A1:B3, C3) * 2.1 + C4 / B1 - MIN(A1:A3)")
     for token in tokens:
         ic(token)
 
     ast = parser.parse(tokens)
-    ic(ast)
+    dump = ast.dump()
+    ic(dump)
+    ic("-------------------------------------------------------")

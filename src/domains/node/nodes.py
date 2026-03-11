@@ -1,3 +1,5 @@
+from typing import Any
+
 from src.domains.node.exceptions import (
     InvalidBinaryOpValueTypeError,
     InvalidFunctionValueTypeError,
@@ -16,7 +18,8 @@ from src.domains.token import (
 
 
 class ASTNode:
-    pass
+    def dump(self) -> dict[str, Any]:
+        return {}
 
 
 class BinaryOpNode(ASTNode):
@@ -32,6 +35,15 @@ class BinaryOpNode(ASTNode):
         self._operator = op
         self._right = right
 
+    def dump(self) -> dict[str, Any]:
+        return {
+            "BinaryOpNode": {
+                "left": self._left.dump(),
+                "op": self._operator.value.value,
+                "right": self._right.dump(),
+            }
+        }
+
 
 class LetterNode(ASTNode):
     __slots__ = ("_letter",)
@@ -43,6 +55,9 @@ class LetterNode(ASTNode):
             raise InvalidLetterValueTypeError(letter, LetterValue)
 
         self._letter = letter
+
+    def dump(self) -> dict[str, Any]:
+        return {"LetterNode": self._letter.value}
 
 
 class FunctionNode(ASTNode):
@@ -56,6 +71,14 @@ class FunctionNode(ASTNode):
 
         self._function = function
         self._args = args
+
+    def dump(self) -> dict[str, Any]:
+        return {
+            "FunctionNode": {
+                "func": self._function.value.value,
+                "args": [a.dump() for a in self._args],
+            }
+        }
 
 
 class RangeNode(ASTNode):
@@ -73,6 +96,14 @@ class RangeNode(ASTNode):
         self._start = start
         self._end = end
 
+    def dump(self) -> dict[str, Any]:
+        return {
+            "RangeNode": {
+                "start": self._start.value,
+                "end": self._end.value,
+            }
+        }
+
 
 class NumberNode(ASTNode):
     __slots__ = ("_value",)
@@ -84,3 +115,6 @@ class NumberNode(ASTNode):
             raise InvalidNumberValueTypeError(value, NumberValue)
 
         self._value = value
+
+    def dump(self) -> dict[str, Any]:
+        return {"NumberNode": self._value.value}

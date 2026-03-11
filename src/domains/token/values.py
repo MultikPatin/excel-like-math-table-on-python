@@ -15,6 +15,8 @@ from .exceptions import (
     InvalidOperatorValueError,
 )
 
+_CELL_PATTERN = re.compile(r"^[A-Z]+[0-9]+$")
+
 
 class Value:
     __slots__ = ("_value",)
@@ -40,9 +42,6 @@ class NumberValue(Value):
     @property
     def value(self) -> float | int:
         return self._value
-
-
-_CELL_PATTERN = re.compile(r"^[A-Z]+[0-9]+$")
 
 
 class LetterValue(Value):

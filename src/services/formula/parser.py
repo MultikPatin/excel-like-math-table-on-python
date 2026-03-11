@@ -46,7 +46,7 @@ class Parser:
 
         while self._peek().is_type_operator():
             op = self._peek_value()
-            if op in enum:
+            if op.value in enum:
                 self._position += 1
                 right = func()
                 left = BinaryOpNode(left=left, op=op, right=right)
@@ -103,12 +103,9 @@ class Parser:
                 if self._is_range_start():
                     start = self._peek_value()
                     self._position += 1
-
                     self._expect(TypeEnum.COLON)
-
                     end = self._peek_value()
                     self._position += 1
-
                     args.append(RangeNode(start=start, end=end))
                 else:
                     args.append(self._parse_expression())
