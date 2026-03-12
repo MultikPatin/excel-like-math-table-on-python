@@ -1,6 +1,5 @@
-from typing import Any
-
 from .enums import TypeEnum
+from .exceptions import InvalidValueError
 from .values import (
     FormulaCharValue,
     FunctionValue,
@@ -25,26 +24,31 @@ class Token:
 
     _value: TypeValue
 
-    def __init__(self, type_: TypeEnum, position: int, value: Any) -> None:  # noqa: ANN401
+    def __init__(
+        self, type_: TypeEnum, position: int, value: str | None
+    ) -> None:
         self._type = type_
         self._position = position
 
-        if self._type in (
-            TypeEnum.LPAREN,
-            TypeEnum.RPAREN,
-            TypeEnum.COLON,
-            TypeEnum.COMMA,
-        ):
-            self._value = FormulaCharValue(value)
+        if value is not None:
+            if self._type in (
+                TypeEnum.LPAREN,
+                TypeEnum.RPAREN,
+                TypeEnum.COLON,
+                TypeEnum.COMMA,
+            ):
+                self._value = FormulaCharValue(value)
+            else:
+                self._sanitize_value(value)
         elif self._type == TypeEnum.EOF:
             self._value = Value()
         else:
-            self._sanitize_value(value)
+            raise InvalidValueError(value)
 
-    def _sanitize_value(self, value: Any) -> None:  # noqa: ANN401
+    def _sanitize_value(self, value: str) -> None:
         match self._type:
             case TypeEnum.NUMBER:
-                self._value = NumberValue(value)
+                self._value = NumberValue.from_str(value)
             case TypeEnum.OPERATOR:
                 self._value = OperatorValue(value)
             case TypeEnum.FUNCTION:

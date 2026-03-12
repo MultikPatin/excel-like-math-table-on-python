@@ -11,12 +11,17 @@ class Cell[T]:
         "_dependencies",
         "_dependents",
         "_formula",
+        "_parser",
         "_row",
         "_value",
     )
 
     def __init__(
-        self, row: int = 0, col: int = 0, *, value: T | None = None
+        self,
+        row: int = 0,
+        col: int = 0,
+        *,
+        value: T | None = None,
     ) -> None:
         self._row = row
         self._col = col
@@ -42,6 +47,13 @@ class Cell[T]:
         self, formula: "TypeFormula", dependencies: "TypeCellDependencies"
     ) -> None:
         self._unlink_dependents()
+
+        # def cell_lookup_function() -> Any:
+        #     return 1.2
+        #
+        # ast_builder = ASTBuilder()
+        # evaluator = Evaluator(cell_lookup_function)
+
         self._formula = formula
         self._link_dependents(dependencies)
         self.recalculate()

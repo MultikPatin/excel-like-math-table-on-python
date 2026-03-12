@@ -1,15 +1,19 @@
-from src._type import Char
+from src.domains.node import ASTNode
 from src.domains.token import FormulaCharsEnum, Token, TypeEnum
 
+from ._type import Char
+from .parser import Parser
 
-class Tokenizer:
-    __slots__ = ["_cursor", "_length", "_text", "_tokens"]
+
+class ASTBuilder:
+    __slots__ = ("_cursor", "_length", "_parser", "_text", "_tokens")
 
     def __init__(self) -> None:
         self._text: str = ""
         self._length: int = 0
         self._cursor: int = 0
         self._tokens: list[Token] = []
+        self._parser = Parser()
 
     def _reset(self, text: str) -> None:
         self._sanitize_text(text)
@@ -17,9 +21,11 @@ class Tokenizer:
         self._tokens: list[Token] = []
 
     def _sanitize_text(self, text: str) -> None:
-        self._text = (
-            text[1:] if text.startswith(FormulaCharsEnum.EQUALITY) else text
-        )
+        if not text.startswith(FormulaCharsEnum.EQUALITY):
+            msg = f"Formula must start with '{FormulaCharsEnum.EQUALITY}'"
+            raise SyntaxError(msg)
+
+        self._text = text[1:]
 
     def _in_range(self) -> bool:
         return self._cursor < len(self._text)
@@ -37,7 +43,11 @@ class Tokenizer:
             position = self._cursor
         self._tokens.append(Token(type_=type_, value=value, position=position))
 
-    def tokenize(self, text: str) -> list[Token]:
+    def build(self, text: str) -> ASTNode:
+        tokens = self._tokenize(text)
+        return self._parser.parse(tokens)
+
+    def _tokenize(self, text: str) -> list[Token]:
         self._reset(text)
 
         while self._in_range():

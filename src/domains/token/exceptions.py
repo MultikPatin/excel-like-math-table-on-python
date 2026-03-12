@@ -11,6 +11,12 @@ class DomainError(Exception):
         super().__init__(message)
 
 
+class InvalidValueError(DomainError):
+    def __init__(self, value: str | None) -> None:
+        msg = f"Invalid value '{value}' of type: {type(value)}"
+        super().__init__(msg)
+
+
 class InvalidOperatorValueError(DomainError):
     def __init__(self, value: str) -> None:
         msg = f"Operator must be one of: {get_all_operators()}, but got {value}"

@@ -35,6 +35,18 @@ class BinaryOpNode(ASTNode):
         self._operator = op
         self._right = right
 
+    @property
+    def left(self) -> ASTNode:
+        return self._left
+
+    @property
+    def operator(self) -> OperatorValue:
+        return self._operator
+
+    @property
+    def right(self) -> ASTNode:
+        return self._right
+
     def dump(self) -> dict[str, Any]:
         return {
             "BinaryOpNode": {
@@ -56,6 +68,10 @@ class LetterNode(ASTNode):
 
         self._letter = letter
 
+    @property
+    def letter(self) -> LetterValue:
+        return self._letter
+
     def dump(self) -> dict[str, Any]:
         return {"LetterNode": self._letter.value}
 
@@ -71,6 +87,14 @@ class FunctionNode(ASTNode):
 
         self._function = function
         self._args = args
+
+    @property
+    def function(self) -> FunctionValue:
+        return self._function
+
+    @property
+    def args(self) -> list[ASTNode]:
+        return self._args
 
     def dump(self) -> dict[str, Any]:
         return {
@@ -96,6 +120,14 @@ class RangeNode(ASTNode):
         self._start = start
         self._end = end
 
+    @property
+    def start(self) -> LetterValue:
+        return self._start
+
+    @property
+    def end(self) -> LetterValue:
+        return self._end
+
     def dump(self) -> dict[str, Any]:
         return {
             "RangeNode": {
@@ -108,13 +140,17 @@ class RangeNode(ASTNode):
 class NumberNode(ASTNode):
     __slots__ = ("_value",)
 
-    _value: NumberValue
+    _number: NumberValue
 
     def __init__(self, value: Value) -> None:
         if not isinstance(value, NumberValue):
             raise InvalidNumberValueTypeError(value, NumberValue)
 
-        self._value = value
+        self._number = value
+
+    @property
+    def value(self) -> NumberValue:
+        return self._number
 
     def dump(self) -> dict[str, Any]:
-        return {"NumberNode": self._value.value}
+        return {"NumberNode": self._number.value}

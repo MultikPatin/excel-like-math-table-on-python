@@ -1,10 +1,15 @@
-def range_to_cells(start: str, end: str) -> list[tuple[int, int]]:
+from src.domains.token import LetterValue
+
+
+def range_to_cells(
+    start: LetterValue, end: LetterValue
+) -> list[tuple[int, int]]:
     """Превращает 'A1:B3' в список
     [(1, 1), (1, 2), (1, 3), (2, 1), (2, 2), (2, 3)]
     """
 
-    s_alpha, s_digit = split_latter(start)
-    e_alpha, e_digit = split_latter(end)
+    s_alpha, s_digit = split_latter(start.value)
+    e_alpha, e_digit = split_latter(end.value)
     return [
         (col, row)
         for col in range(letters_to_num(s_alpha), letters_to_num(e_alpha) + 1)
