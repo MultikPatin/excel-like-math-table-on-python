@@ -1,48 +1,80 @@
-from typing import Any
+from src.domains.node import (
+    ASTNode,
+    BinaryOpNode,
+    FunctionNode,
+    LetterNode,
+    NumberNode,
+    RangeNode,
+)
+from src.domains.values import FormulaCharsEnum, LetterValue, NumberValue
 
-from src.domains.table import Table, TypeTableValues
-from src.domains.token import TypeValue
-
-from .cell import Cell, TypeCellDependencies, TypeFormula
+from .cell import Cell
+from .cell.formula import ASTBuilder
+from .cell.formula.functions import call_func, call_op
 
 
 class Sheet:
-    __slots__ = ("_sheet", "_table")
+    __slots__ = ("_ast_builder", "_cells", "_evaluator")
 
-    def __init__(self, values: TypeTableValues) -> None:
-        self._table = Table(values=values)
-        self._sheet = []
+    def __init__(self) -> None:
+        self._cells: dict[LetterValue, Cell] = {}
+        self._ast_builder = ASTBuilder()
 
-        for i in range(self._table.rows):
-            self._sheet.append([])
-            for j in range(self._table.columns):
-                self._sheet[i].append(
-                    Cell[TypeValue](i, j, value=self._table.get_value(i, j))
-                )
+    def _cell(self, letter: LetterValue) -> Cell:
+        if letter in self._cells:
+            return self._cells[letter]
+        # TODO Set custom exception
+        msg = f"Sheet has no cell with that {letter}"
+        raise ValueError(msg)
 
-    def get_table(self) -> TypeTableValues:
-        return self._table.values
+    def set_value(self, letter: str, value: str) -> None:
+        _letter = LetterValue(letter)
 
-    def set_value(self, row: int, col: int, *, value: Any) -> None:  # noqa: ANN401
-        self._cell(row, col).value = value
+        if value.startswith(FormulaCharsEnum.EQUALITY):
+            self._set_formula(_letter, value)
+        else:
+            self._set_value(_letter, value)
 
-    def set_formula(
-        self,
-        row: int,
-        col: int,
-        *,
-        formula: TypeFormula,
-        dependencies: TypeCellDependencies,
-    ) -> None:
-        self._cell(row, col).set_formula(formula, dependencies)
-
-    def _cell(self, row: int, col: int) -> Cell:
+    def _set_value(self, letter: LetterValue, value: str) -> None:
         try:
-            return self._sheet[row][col]
-        except IndexError:
-            shape = (len(self._sheet), len(self._sheet[0]))
-            msg = (
-                f"Index out of range. Table shape: {shape}. "
-                f"Requested row: {row}, column: {col}"
-            )  # TODO Set custom exception
-            raise ValueError(msg)  # noqa: B904
+            cell = self._cell(letter)
+            cell.value = NumberValue.from_str(value)
+        except ValueError:
+            self._cells[letter] = Cell(NumberValue.from_str(value))
+
+    def _set_formula(self, letter: LetterValue, value: str) -> None:
+        try:
+            cell = self._cell(letter)
+        except ValueError:
+            self._cells[letter] = Cell(NumberValue.from_str("0"))
+            cell = self._cell(letter)
+
+        ast = self._ast_builder.build(value)
+        cell.value = self._evaluate(ast)
+
+    def _evaluate[Node: ASTNode](self, node: Node):  # noqa: ANN202
+        if isinstance(node, NumberNode):
+            return node.value
+
+        if isinstance(node, LetterNode):
+            cell = self._cell(node.letter)
+            return cell.value if cell else 0
+
+        if isinstance(node, RangeNode):
+            return [self._cell(cell).value for cell in node.expand()]
+
+        if isinstance(node, FunctionNode):
+            return call_func(
+                node.function, [self._evaluate(a) for a in node.args]
+            )
+
+        if isinstance(node, BinaryOpNode):
+            return call_op(
+                node.operator,
+                self._evaluate(node.left),
+                self._evaluate(node.right),
+            )
+
+        # TODO Custom exception!
+        msg = f"Invalid Node: {type(node)}"
+        raise ValueError(msg)

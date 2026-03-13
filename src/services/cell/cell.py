@@ -1,41 +1,27 @@
 from collections.abc import Callable, MutableSequence
 
+from src.domains.values import NumberValue
+
 type TypeCellDependencies = MutableSequence[Cell]
 type TypeCellDependents = MutableSequence[Cell]
 type TypeFormula = Callable | None
 
 
-class Cell[T]:
-    __slots__ = (
-        "_col",
-        "_dependencies",
-        "_dependents",
-        "_formula",
-        "_parser",
-        "_row",
-        "_value",
-    )
+class Cell:
+    __slots__ = ("_dependencies", "_dependents", "_formula", "_value")
 
-    def __init__(
-        self,
-        row: int = 0,
-        col: int = 0,
-        *,
-        value: T | None = None,
-    ) -> None:
-        self._row = row
-        self._col = col
+    def __init__(self, value: NumberValue) -> None:
         self._value = value
         self._dependents: TypeCellDependents = []
         self._formula: TypeFormula = None
         self._dependencies: TypeCellDependencies = []
 
     @property
-    def value(self) -> T | None:
+    def value(self) -> NumberValue:
         return self._value
 
     @value.setter
-    def value(self, value: T) -> None:
+    def value(self, value: NumberValue) -> None:
         self._value = value
         self._recalculate_depends()
 
@@ -47,13 +33,6 @@ class Cell[T]:
         self, formula: "TypeFormula", dependencies: "TypeCellDependencies"
     ) -> None:
         self._unlink_dependents()
-
-        # def cell_lookup_function() -> Any:
-        #     return 1.2
-        #
-        # ast_builder = ASTBuilder()
-        # evaluator = Evaluator(cell_lookup_function)
-
         self._formula = formula
         self._link_dependents(dependencies)
         self.recalculate()

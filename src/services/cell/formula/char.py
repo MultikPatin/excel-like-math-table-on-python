@@ -1,4 +1,4 @@
-from src.domains.token import FormulaCharsEnum, get_all_operators
+from src.domains.values import FormulaCharsEnum, get_all_operators
 
 
 class Char(str):

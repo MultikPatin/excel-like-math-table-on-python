@@ -1,6 +1,4 @@
-from .enums import TypeEnum
-from .exceptions import InvalidValueError
-from .values import (
+from src.domains.values import (
     FormulaCharValue,
     FunctionValue,
     LetterValue,
@@ -8,8 +6,10 @@ from .values import (
     OperatorValue,
     Value,
 )
+from src.domains.values.enums import TypeEnum
+from src.services.exceptions import InvalidTokenValueError
 
-type TypeValue = (
+type TypeTokenValue = (
     NumberValue
     | LetterValue
     | FunctionValue
@@ -20,15 +20,12 @@ type TypeValue = (
 
 
 class Token:
-    __slots__ = ("_position", "_type", "_value")
+    __slots__ = ("_type", "_value")
 
-    _value: TypeValue
+    _value: TypeTokenValue
 
-    def __init__(
-        self, type_: TypeEnum, position: int, value: str | None
-    ) -> None:
+    def __init__(self, type_: TypeEnum, value: str | None) -> None:
         self._type = type_
-        self._position = position
 
         if value is not None:
             if self._type in (
@@ -43,7 +40,7 @@ class Token:
         elif self._type == TypeEnum.EOF:
             self._value = Value()
         else:
-            raise InvalidValueError(value)
+            raise InvalidTokenValueError(value)
 
     def _sanitize_value(self, value: str) -> None:
         match self._type:
@@ -57,7 +54,7 @@ class Token:
                 self._value = LetterValue(value)
 
     @property
-    def value(self) -> TypeValue:
+    def value(self) -> TypeTokenValue:
         return self._value
 
     @property
@@ -89,4 +86,4 @@ class Token:
         return self._type == TypeEnum.COMMA
 
     def __repr__(self) -> str:
-        return f"Token({self._position} | {self._type}: '{self._value.value}')"
+        return f"Token({self._type}: '{self._value.value}')"

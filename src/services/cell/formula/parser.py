@@ -8,13 +8,13 @@ from src.domains.node import (
     NumberNode,
     RangeNode,
 )
-from src.domains.token import (
+from src.domains.values import (
     FirstPriorityOperatorsEnum,
     SecondPriorityOperatorsEnum,
-    Token,
     TypeEnum,
-    TypeValue,
 )
+
+from .token import Token, TypeTokenValue
 
 INVALID_TYPE = "Invalid token value type, received: {type}"
 type OperatorEnumType = (
@@ -23,17 +23,17 @@ type OperatorEnumType = (
 
 
 class Parser:
-    __slots__ = ["_position", "_tokens"]
+    __slots__ = ["_cursor", "_tokens"]
 
     def __init__(self) -> None:
-        self._position = 0
+        self._cursor = 0
         self._tokens: list[Token] = []
 
     def parse(self, tokens: list[Token]) -> ASTNode:
-        self._position = 0
+        self._cursor = 0
         self._tokens = tokens
         ast = self._parse_expression()
-        self._expect(TypeEnum.EOF, inc_position=False)
+        self._expect(TypeEnum.EOF, inc_cursor=False)
         return ast
 
     def _parse_expression(self) -> ASTNode:
@@ -47,7 +47,7 @@ class Parser:
         while self._peek().is_type_operator():
             op = self._peek_value()
             if op.value in enum:
-                self._position += 1
+                self._cursor += 1
                 right = func()
                 left = BinaryOpNode(left=left, op=op, right=right)
             else:
@@ -71,18 +71,18 @@ class Parser:
         token = self._peek()
 
         if token.is_type_number():
-            self._position += 1
+            self._cursor += 1
             return NumberNode(value=token.value)
 
         if token.is_type_cell():
-            self._position += 1
+            self._cursor += 1
             return LetterNode(letter=token.value)
 
         if token.is_type_function():
             return self._parse_function()
 
         if token.is_type_lparen():
-            self._position += 1
+            self._cursor += 1
             expr = self._parse_expression()
             self._expect(TypeEnum.RPAREN)
             return expr
@@ -93,7 +93,7 @@ class Parser:
 
     def _parse_function(self) -> FunctionNode:
         function = self._peek_value()
-        self._position += 1
+        self._cursor += 1
         self._expect(TypeEnum.LPAREN)
 
         args = []
@@ -102,16 +102,16 @@ class Parser:
             while True:
                 if self._is_range_start():
                     start = self._peek_value()
-                    self._position += 1
+                    self._cursor += 1
                     self._expect(TypeEnum.COLON)
                     end = self._peek_value()
-                    self._position += 1
+                    self._cursor += 1
                     args.append(RangeNode(start=start, end=end))
                 else:
                     args.append(self._parse_expression())
 
                 if self._peek().is_type_comma():
-                    self._position += 1
+                    self._cursor += 1
                     continue
                 break
 
@@ -119,14 +119,14 @@ class Parser:
         return FunctionNode(function=function, args=args)
 
     def _peek(self) -> Token:
-        return self._tokens[self._position]
+        return self._tokens[self._cursor]
 
-    def _peek_value(self) -> TypeValue:
+    def _peek_value(self) -> TypeTokenValue:
         return self._peek().value
 
     def _peek_next(self) -> Token | None:
-        if self._position + 1 < len(self._tokens):
-            return self._tokens[self._position + 1]
+        if self._cursor + 1 < len(self._tokens):
+            return self._tokens[self._cursor + 1]
         return None
 
     def _is_range_start(self) -> bool:
@@ -135,13 +135,13 @@ class Parser:
             return False
         return self._peek().is_type_cell() and next_.is_type_colon()
 
-    def _expect(self, expected: TypeEnum, inc_position: bool = True) -> Token:
+    def _expect(self, expected: TypeEnum, inc_cursor: bool = True) -> Token:
         if self._peek().type != expected:
             msg = (
                 f"Expected type: {expected}, type received: {self._peek().type}"
             )
             # TODO Custom exception!
             raise SyntaxError(msg)
-        if inc_position:
-            self._position += 1
+        if inc_cursor:
+            self._cursor += 1
         return self._peek()

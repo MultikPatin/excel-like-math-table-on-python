@@ -3,10 +3,6 @@ from icecream import ic
 from src.services import Sheet
 from src.services.cell.formula import ASTBuilder
 
-_ROWS_COUNT: int = 4
-_COLS_COUNT: int = 5
-_SCHEMA_COUNT: int = 5
-
 if __name__ == "__main__":
     ast_builder = ASTBuilder()
 
@@ -18,6 +14,7 @@ if __name__ == "__main__":
         "=SUM(A1:B3, MIN(A1:A3))",
         "=SUM(A1:B3, MAX(A1:A3)) / 2.1 + C4",
         "=SUM(A1:B3, C3) * 2.1 + C4 / B1 - MIN(A1:A3)",
+        "=MAX(MIN(A1:A3), SUM(C1:C3, D1:D3), B1 * 2.1 + C4 / B1)",
     ]
 
     for formula in formulas:
@@ -27,10 +24,9 @@ if __name__ == "__main__":
         ic(ast.dump())
 
     ic("=============================================================")
-    values: list[list[int]] = [
-        [(i * 10 + j) for j in range(_COLS_COUNT)] for i in range(_ROWS_COUNT)
-    ]
 
-    sheet = Sheet(values)
-    values = sheet.get_table()
-    ic(values)
+    sheet = Sheet()
+    sheet.set_value("A1", "1")
+    sheet.set_value("A2", "1")
+    sheet.set_value("A3", "=A1+A2")
+    ic()
