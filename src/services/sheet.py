@@ -8,9 +8,8 @@ from src.domains.node import (
 )
 from src.domains.values import FormulaCharsEnum, LetterValue, NumberValue
 
-from .cell import Cell
-from .cell.formula import ASTBuilder
-from .cell.formula.functions import call_func, call_op
+from .cell import ASTBuilder, Cell, call_func, call_op
+from .exceptions import InvalidCellError, InvalidNodeTypeError
 
 
 class Sheet:
@@ -23,9 +22,7 @@ class Sheet:
     def _cell(self, letter: LetterValue) -> Cell:
         if letter in self._cells:
             return self._cells[letter]
-        # TODO Set custom exception
-        msg = f"Sheet has no cell with that {letter}"
-        raise ValueError(msg)
+        raise InvalidCellError(str(letter))
 
     def set_value(self, letter: str, value: str) -> None:
         _letter = LetterValue(letter)
@@ -39,13 +36,13 @@ class Sheet:
         try:
             cell = self._cell(letter)
             cell.value = NumberValue.from_str(value)
-        except ValueError:
+        except InvalidCellError:
             self._cells[letter] = Cell(NumberValue.from_str(value))
 
     def _set_formula(self, letter: LetterValue, value: str) -> None:
         try:
             cell = self._cell(letter)
-        except ValueError:
+        except InvalidCellError:
             self._cells[letter] = Cell(NumberValue.from_str("0"))
             cell = self._cell(letter)
 
@@ -75,6 +72,4 @@ class Sheet:
                 self._evaluate(node.right),
             )
 
-        # TODO Custom exception!
-        msg = f"Invalid Node: {type(node)}"
-        raise ValueError(msg)
+        raise InvalidNodeTypeError(node)

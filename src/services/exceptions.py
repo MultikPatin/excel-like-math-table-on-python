@@ -12,6 +12,18 @@ class InvalidTokenValueError(ServiceError):
         super().__init__(msg)
 
 
+class InvalidCellError(ServiceError):
+    def __init__(self, letter: str) -> None:
+        msg = f"Sheet has no cell with that letter: {letter}"
+        super().__init__(msg)
+
+
+class InvalidNodeTypeError(ServiceError):
+    def __init__(self, node: Any) -> None:  # noqa: ANN401
+        msg = f"Invalid Node type: {type(node)}"
+        super().__init__(msg)
+
+
 class UnexpectedCharError(ServiceError):
     def __init__(self, char: str, position: int) -> None:
         msg = f"Unexpected character '{char}' at position {position}"
@@ -19,7 +31,7 @@ class UnexpectedCharError(ServiceError):
 
 
 class UnexpectedTokenError(ServiceError):
-    def __init__(self, token: Any) -> None:  # noqa: ANN401
+    def __init__(self, token: str) -> None:
         msg = f"Unexpected token: {token}"
         super().__init__(msg)
 
