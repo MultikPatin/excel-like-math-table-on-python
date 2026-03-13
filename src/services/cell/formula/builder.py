@@ -1,5 +1,6 @@
 from src.domains.node import ASTNode
 from src.domains.values import FormulaCharsEnum, TypeEnum
+from src.services.exceptions import UnexpectedCharError
 
 from .char import Char
 from .parser import Parser
@@ -83,9 +84,7 @@ class ASTBuilder:
                 self._cursor += 1
                 continue
 
-            msg = f"Unexpected character '{char}' at position {self._cursor}"
-            # TODO Custom exception!
-            raise SyntaxError(msg)
+            raise UnexpectedCharError(char, self._cursor)
 
         self._set_token(TypeEnum.EOF)
         return self._tokens

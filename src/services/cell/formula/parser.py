@@ -13,6 +13,10 @@ from src.domains.values import (
     SecondPriorityOperatorsEnum,
     TypeEnum,
 )
+from src.services.exceptions import (
+    UnexpectedTokenError,
+    UnexpectedTokenTypeError,
+)
 
 from .token import Token, TypeTokenValue
 
@@ -87,9 +91,7 @@ class Parser:
             self._expect(TypeEnum.RPAREN)
             return expr
 
-        msg = f"Unexpected token: {token}"
-        # TODO Custom exception!
-        raise SyntaxError(msg)
+        raise UnexpectedTokenError(str(token))
 
     def _parse_function(self) -> FunctionNode:
         function = self._peek_value()
@@ -136,12 +138,9 @@ class Parser:
         return self._peek().is_type_cell() and next_.is_type_colon()
 
     def _expect(self, expected: TypeEnum, inc_cursor: bool = True) -> Token:
-        if self._peek().type != expected:
-            msg = (
-                f"Expected type: {expected}, type received: {self._peek().type}"
-            )
-            # TODO Custom exception!
-            raise SyntaxError(msg)
+        actual = self._peek().type
+        if actual != expected:
+            raise UnexpectedTokenTypeError(actual, expected)
         if inc_cursor:
             self._cursor += 1
         return self._peek()
