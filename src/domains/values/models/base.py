@@ -1,5 +1,5 @@
 class Value:
-    __slots__ = ("_value",)
+    # __slots__ = ("_value",)
 
     @property
     def value(self) -> None:

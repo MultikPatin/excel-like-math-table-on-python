@@ -12,15 +12,21 @@ class InvalidTokenValueError(ServiceError):
         super().__init__(msg)
 
 
-class InvalidCellError(ServiceError):
-    def __init__(self, letter: str) -> None:
-        msg = f"Sheet has no cell with that letter: {letter}"
-        super().__init__(msg)
-
-
 class InvalidNodeTypeError(ServiceError):
     def __init__(self, node: Any) -> None:  # noqa: ANN401
         msg = f"Invalid Node type: {type(node)}"
+        super().__init__(msg)
+
+
+class InvalidFunctionError(ServiceError):
+    def __init__(self, function: Any) -> None:  # noqa: ANN401
+        msg = f"Invalid function: {function}"
+        super().__init__(msg)
+
+
+class InvalidOperatorError(ServiceError):
+    def __init__(self, operator: Any) -> None:  # noqa: ANN401
+        msg = f"Invalid operator: {operator}"
         super().__init__(msg)
 
 

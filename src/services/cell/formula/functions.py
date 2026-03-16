@@ -1,14 +1,15 @@
-from collections.abc import Sequence
+from collections.abc import Iterable
 from operator import add, mul, sub, truediv
 
-from src.domains.node import NumberNode
 from src.domains.values import (
     FirstPriorityOperatorsEnum,
     FunctionsEnum,
     FunctionValue,
+    NumberValue,
     OperatorValue,
     SecondPriorityOperatorsEnum,
 )
+from src.services.exceptions import InvalidFunctionError, InvalidOperatorError
 
 OPERATION_MAP = {
     FirstPriorityOperatorsEnum.MUL: mul,
@@ -23,19 +24,32 @@ FUNCTION_MAP = {
 }
 
 
-def call_op(operator: OperatorValue, left: NumberNode, right: NumberNode):  # noqa: ANN201
+def call_op(operator: OperatorValue, left: NumberValue, right: NumberValue):  # noqa: ANN201
     try:
-        return OPERATION_MAP[operator.value](left.value, right.value)
+        return NumberValue(OPERATION_MAP[operator.value](left, right))
     except KeyError as e:
-        # TODO Custom exception!
-        msg = f"Invalid operator: {operator}"
-        raise ValueError(msg) from e
+        raise InvalidOperatorError(operator) from e
 
 
-def call_func(function: FunctionValue, args: Sequence):  # noqa: ANN201
+def call_func(function: FunctionValue, args: Iterable):  # noqa: ANN201
     try:
-        return FUNCTION_MAP[function.value](*args)
+        return FUNCTION_MAP[function.value](flatten(args))
     except KeyError as e:
-        # TODO Custom exception!
-        msg = f"Invalid function: {function}"
-        raise ValueError(msg) from e
+        raise InvalidFunctionError(function) from e
+
+
+def flatten(nested_list: Iterable) -> list:
+    """
+    Рекурсивно "расплющивает" вложенный список в одномерный.
+    Все элементы из подсписков перемещаются в один общий список.
+
+    Пример:
+        [[1, 2], [3, [4, 5]], 6] → [1, 2, 3, 4, 5, 6]
+    """
+    result = []
+    for item in nested_list:
+        if isinstance(item, list):
+            result.extend(flatten(item))
+        else:
+            result.append(item)
+    return result

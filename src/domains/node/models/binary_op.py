@@ -11,7 +11,9 @@ class BinaryOpNode(ASTNode):
 
     _operator: OperatorValue
 
-    def __init__(self, left: ASTNode, op: Value, right: ASTNode) -> None:
+    def __init__[Node: ASTNode, Operator: Value](
+        self, left: Node, op: Operator, right: Node
+    ) -> None:
         if not isinstance(op, OperatorValue):
             raise InvalidBinaryOpValueTypeError(op, OperatorValue)
 
