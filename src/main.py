@@ -1,9 +1,11 @@
 from icecream import ic
 
 from src.services import Sheet
-from src.services.cell.formula import ASTBuilder
+from src.services.cell import Cell
+from src.services.formula import ASTBuilder, Tokenizer
 
 if __name__ == "__main__":
+    tokenizer = Tokenizer()
     ast_builder = ASTBuilder()
 
     formulas = [
@@ -20,12 +22,14 @@ if __name__ == "__main__":
     for formula in formulas:
         ic("-------------------------------------------------------")
         ic(formula)
-        ast = ast_builder.build(formula)
+        tokens = tokenizer.tokenize(formula)
+        ast = ast_builder.build(tokens)
         ic(ast.dump())
 
     ic("=============================================================")
 
-    sheet = Sheet()
+    sheet = Sheet(tokenizer=tokenizer, ast_builder=ast_builder, cell_cls=Cell)
+
     sheet.set_value("A1", "1")
     sheet.set_value("A2", "1")
     ic("=A1+A2")

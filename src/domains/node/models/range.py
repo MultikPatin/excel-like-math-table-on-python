@@ -4,7 +4,7 @@ from src.domains.node.exceptions import (
     InvalidRangeEbdValueTypeError,
     InvalidRangeStartValueTypeError,
 )
-from src.domains.values import LetterValue, Value
+from src.domains.value import LetterValue, Value
 
 from .base import ASTNode
 

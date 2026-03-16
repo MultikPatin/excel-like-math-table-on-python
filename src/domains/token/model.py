@@ -1,4 +1,4 @@
-from src.domains.values import (
+from src.domains.value import (
     FormulaCharValue,
     FunctionValue,
     LetterValue,
@@ -6,17 +6,10 @@ from src.domains.values import (
     OperatorValue,
     Value,
 )
-from src.domains.values.enums import TypeEnum
+from src.domains.value.enums import TypeEnum
 from src.services.exceptions import InvalidTokenValueError
 
-type TypeTokenValue = (
-    NumberValue
-    | LetterValue
-    | FunctionValue
-    | OperatorValue
-    | FormulaCharValue
-    | Value
-)
+from ._type import TypeTokenValue
 
 
 class Token:

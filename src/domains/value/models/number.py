@@ -1,7 +1,7 @@
 from typing import Self
 
-from src.domains.values.enums import FormulaCharsEnum
-from src.domains.values.exceptions import InvalidNumberValueError
+from src.domains.value.enums import FormulaCharsEnum
+from src.domains.value.exceptions import InvalidNumberValueError
 
 from .base import Value
 

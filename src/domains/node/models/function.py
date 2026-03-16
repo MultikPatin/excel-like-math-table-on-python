@@ -1,7 +1,7 @@
 from typing import Any
 
 from src.domains.node.exceptions import InvalidFunctionValueTypeError
-from src.domains.values import FunctionValue, Value
+from src.domains.value import FunctionValue, Value
 
 from .base import ASTNode
 

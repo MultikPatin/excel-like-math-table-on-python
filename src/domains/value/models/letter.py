@@ -1,6 +1,6 @@
 import re
 
-from src.domains.values.exceptions import InvalidCellValueError
+from src.domains.value.exceptions import InvalidCellValueError
 
 from .base import Value
 
@@ -8,6 +8,8 @@ _CELL_PATTERN = re.compile(r"^[A-Z]+[0-9]+$")
 
 
 class LetterValue(Value):
+    __slots__ = ("_value",)
+
     def __init__(self, value: str) -> None:
         if not _CELL_PATTERN.match(value):
             raise InvalidCellValueError(value, _CELL_PATTERN)

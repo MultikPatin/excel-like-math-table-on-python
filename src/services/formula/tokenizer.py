@@ -1,20 +1,17 @@
-from src.domains.node import ASTNode
-from src.domains.values import FormulaCharsEnum, TypeEnum
+from src.domains.token import Token
+from src.domains.value import FormulaCharsEnum, TypeEnum
 from src.services.exceptions import UnexpectedCharError
 
 from .char import Char
-from .parser import Parser
-from .token import Token
 
 
-class ASTBuilder:
-    __slots__ = ("_cursor", "_parser", "_text", "_tokens")
+class Tokenizer:
+    __slots__ = ("_cursor", "_text", "_tokens")
 
     def __init__(self) -> None:
         self._text: str = ""
         self._cursor: int = 0
         self._tokens: list[Token] = []
-        self._parser = Parser()
 
     def _reset(self, text: str) -> None:
         self._sanitize_text(text)
@@ -37,11 +34,7 @@ class ASTBuilder:
     def _set_token(self, type_: TypeEnum, value: str | None = None) -> None:
         self._tokens.append(Token(type_=type_, value=value))
 
-    def build(self, text: str) -> ASTNode:
-        tokens = self._tokenize(text)
-        return self._parser.parse(tokens)
-
-    def _tokenize(self, text: str) -> list[Token]:
+    def tokenize(self, text: str) -> list[Token]:
         self._reset(text)
 
         while self._in_range():

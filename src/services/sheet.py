@@ -6,22 +6,36 @@ from src.domains.node import (
     NumberNode,
     RangeNode,
 )
-from src.domains.values import FormulaCharsEnum, LetterValue, NumberValue
+from src.domains.value import FormulaCharsEnum, LetterValue, NumberValue
+from src.protocols import ASTBuilderProtocol, CellProtocol, TokenizerProtocol
 
-from .cell import ASTBuilder, Cell, call_func, call_op
 from .exceptions import InvalidNodeTypeError
+from .functions import call_func, call_op
 
 
 class Sheet:
-    __slots__ = ("_ast_builder", "_cells", "_evaluator")
+    __slots__ = (
+        "_ast_builder",
+        "_cell_cls",
+        "_cells",
+        "_evaluator",
+        "_tokenizer",
+    )
 
-    def __init__(self) -> None:
-        self._cells: dict[LetterValue, Cell] = {}
-        self._ast_builder = ASTBuilder()
+    def __init__(
+        self,
+        tokenizer: TokenizerProtocol,
+        ast_builder: ASTBuilderProtocol,
+        cell_cls: type[CellProtocol],
+    ) -> None:
+        self._cell_cls: type[CellProtocol] = cell_cls
+        self._cells: dict[LetterValue, CellProtocol] = {}
+        self._tokenizer = tokenizer
+        self._ast_builder = ast_builder
 
-    def _cell(self, letter: LetterValue) -> Cell:
+    def _cell(self, letter: LetterValue) -> CellProtocol:
         if letter not in self._cells:
-            self._cells[letter] = Cell(NumberValue.from_str("0"))
+            self._cells[letter] = self._cell_cls(NumberValue.from_str("0"))
 
         return self._cells[letter]
 
@@ -39,8 +53,12 @@ class Sheet:
 
     def _set_formula(self, letter: LetterValue, value: str) -> None:
         cell = self._cell(letter)
-        ast = self._ast_builder.build(value)
+        ast = self._ast_tree(value)
         cell.value = self._evaluate(ast)
+
+    def _ast_tree(self, value: str) -> ASTNode:
+        tokens = self._tokenizer.tokenize(value)
+        return self._ast_builder.build(tokens)
 
     def _evaluate[Node: ASTNode](self, node: Node):  # noqa: ANN202
         if isinstance(node, NumberNode):

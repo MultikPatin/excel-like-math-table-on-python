@@ -1,7 +1,7 @@
 from collections.abc import Iterable
 from operator import add, mul, sub, truediv
 
-from src.domains.values import (
+from src.domains.value import (
     FirstPriorityOperatorsEnum,
     FunctionsEnum,
     FunctionValue,

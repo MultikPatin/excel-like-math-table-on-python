@@ -1,7 +1,7 @@
 from typing import Any
 
 from src.domains.node.exceptions import InvalidNumberValueTypeError
-from src.domains.values import NumberValue, Value
+from src.domains.value import NumberValue, Value
 
 from .base import ASTNode
 

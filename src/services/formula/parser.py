@@ -8,7 +8,8 @@ from src.domains.node import (
     NumberNode,
     RangeNode,
 )
-from src.domains.values import (
+from src.domains.token import Token, TypeTokenValue
+from src.domains.value import (
     FirstPriorityOperatorsEnum,
     SecondPriorityOperatorsEnum,
     TypeEnum,
@@ -18,22 +19,20 @@ from src.services.exceptions import (
     UnexpectedTokenTypeError,
 )
 
-from .token import Token, TypeTokenValue
-
 INVALID_TYPE = "Invalid token value type, received: {type}"
 type OperatorEnumType = (
     type[FirstPriorityOperatorsEnum] | type[SecondPriorityOperatorsEnum]
 )
 
 
-class Parser:
+class ASTBuilder:
     __slots__ = ["_cursor", "_tokens"]
 
     def __init__(self) -> None:
         self._cursor = 0
         self._tokens: list[Token] = []
 
-    def parse(self, tokens: list[Token]) -> ASTNode:
+    def build(self, tokens: list[Token]) -> ASTNode:
         self._cursor = 0
         self._tokens = tokens
         ast = self._parse_expression()

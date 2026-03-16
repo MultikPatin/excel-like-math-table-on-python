@@ -1,10 +1,12 @@
-from src.domains.values.enums import FunctionsEnum
-from src.domains.values.exceptions import InvalidFunctionValueError
+from src.domains.value.enums import FunctionsEnum
+from src.domains.value.exceptions import InvalidFunctionValueError
 
 from .base import Value
 
 
 class FunctionValue(Value):
+    __slots__ = ("_value",)
+
     def __init__(self, value: str) -> None:
         functions = FunctionsEnum.values_set()
         if value not in functions:

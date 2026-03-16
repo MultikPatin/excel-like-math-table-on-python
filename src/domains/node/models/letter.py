@@ -1,7 +1,7 @@
 from typing import Any
 
 from src.domains.node.exceptions import InvalidLetterValueTypeError
-from src.domains.values import LetterValue, Value
+from src.domains.value import LetterValue, Value
 
 from .base import ASTNode
 

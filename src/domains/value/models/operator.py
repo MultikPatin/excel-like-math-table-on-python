@@ -1,13 +1,15 @@
-from src.domains.values.enums import (
+from src.domains.value.enums import (
     FirstPriorityOperatorsEnum,
     SecondPriorityOperatorsEnum,
 )
-from src.domains.values.exceptions import InvalidOperatorValueError
+from src.domains.value.exceptions import InvalidOperatorValueError
 
 from .base import Value
 
 
 class OperatorValue(Value):
+    __slots__ = ("_value",)
+
     def __init__(self, value: str) -> None:
         if value in FirstPriorityOperatorsEnum.values_set():
             self._value = FirstPriorityOperatorsEnum(value)

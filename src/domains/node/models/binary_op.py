@@ -1,7 +1,7 @@
 from typing import Any
 
 from src.domains.node.exceptions import InvalidBinaryOpValueTypeError
-from src.domains.values import OperatorValue, Value
+from src.domains.value import OperatorValue, Value
 
 from .base import ASTNode
 

@@ -1,6 +1,6 @@
 from collections.abc import Callable, MutableSequence
 
-from src.domains.values import NumberValue
+from src.domains.value import NumberValue
 
 type TypeCellDependencies = MutableSequence[Cell]
 type TypeCellDependents = MutableSequence[Cell]

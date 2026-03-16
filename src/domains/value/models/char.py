@@ -1,10 +1,12 @@
-from src.domains.values.enums import FormulaCharsEnum
-from src.domains.values.exceptions import InvalidFormulaCharValueError
+from src.domains.value.enums import FormulaCharsEnum
+from src.domains.value.exceptions import InvalidFormulaCharValueError
 
 from .base import Value
 
 
 class FormulaCharValue(Value):
+    __slots__ = ("_value",)
+
     def __init__(self, value: str) -> None:
         functions = FormulaCharsEnum.values_set()
         if value not in functions:
