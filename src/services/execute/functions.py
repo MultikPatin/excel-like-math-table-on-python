@@ -1,22 +1,12 @@
 from collections.abc import Iterable
-from operator import add, mul, sub, truediv
 
 from src.domains.value import (
-    FirstPriorityOperatorsEnum,
     FunctionsEnum,
     FunctionValue,
     NumberValue,
-    OperatorValue,
-    SecondPriorityOperatorsEnum,
 )
-from src.services.exceptions import InvalidFunctionError, InvalidOperatorError
+from src.services.exceptions import InvalidFunctionError
 
-OPERATION_MAP = {
-    FirstPriorityOperatorsEnum.MUL: mul,
-    FirstPriorityOperatorsEnum.DIV: truediv,
-    SecondPriorityOperatorsEnum.ADD: add,
-    SecondPriorityOperatorsEnum.SUB: sub,
-}
 FUNCTION_MAP = {
     FunctionsEnum.SUM: sum,
     FunctionsEnum.MAX: max,
@@ -24,16 +14,9 @@ FUNCTION_MAP = {
 }
 
 
-def call_op(operator: OperatorValue, left: NumberValue, right: NumberValue):  # noqa: ANN201
+def call_func(function: FunctionValue, args: Iterable) -> NumberValue:
     try:
-        return NumberValue(OPERATION_MAP[operator.value](left, right))
-    except KeyError as e:
-        raise InvalidOperatorError(operator) from e
-
-
-def call_func(function: FunctionValue, args: Iterable):  # noqa: ANN201
-    try:
-        return FUNCTION_MAP[function.value](flatten(args))
+        return NumberValue(FUNCTION_MAP[function.value](flatten(args)))
     except KeyError as e:
         raise InvalidFunctionError(function) from e
 

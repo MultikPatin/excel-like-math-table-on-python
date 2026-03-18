@@ -1,5 +1,6 @@
+from typing import TYPE_CHECKING
+
 from src.domains.node import (
-    ASTNode,
     BinaryOpNode,
     FunctionNode,
     LetterNode,
@@ -7,10 +8,19 @@ from src.domains.node import (
     RangeNode,
 )
 from src.domains.value import FormulaCharsEnum, LetterValue, NumberValue
-from src.protocols import ASTBuilderProtocol, CellProtocol, TokenizerProtocol
 
-from .exceptions import InvalidNodeTypeError
-from .functions import call_func, call_op
+from .exceptions import (
+    InvaliCellValueTypeError,
+    InvalidNodeTypeError,
+    UnexpectedOperandsToOperationError,
+)
+from .execute import call_func, call_op
+
+if TYPE_CHECKING:
+    from src.domains.node import ASTNode
+
+    from .cell import CellProtocol
+    from .formula import ASTBuilderProtocol, TokenizerProtocol
 
 
 class Sheet:
@@ -22,18 +32,20 @@ class Sheet:
         "_tokenizer",
     )
 
+    _cells: "dict[LetterValue, CellProtocol]"
+
     def __init__(
         self,
-        tokenizer: TokenizerProtocol,
-        ast_builder: ASTBuilderProtocol,
-        cell_cls: type[CellProtocol],
+        tokenizer: "TokenizerProtocol",
+        ast_builder: "ASTBuilderProtocol",
+        cell_cls: "type[CellProtocol]",
     ) -> None:
-        self._cell_cls: type[CellProtocol] = cell_cls
-        self._cells: dict[LetterValue, CellProtocol] = {}
+        self._cell_cls = cell_cls
+        self._cells = {}
         self._tokenizer = tokenizer
         self._ast_builder = ast_builder
 
-    def _cell(self, letter: LetterValue) -> CellProtocol:
+    def _cell(self, letter: LetterValue) -> "CellProtocol":
         if letter not in self._cells:
             self._cells[letter] = self._cell_cls(NumberValue.from_str("0"))
 
@@ -42,7 +54,7 @@ class Sheet:
     def set_value(self, letter: str, value: str) -> None:
         _letter = LetterValue(letter)
 
-        if value.startswith(FormulaCharsEnum.EQUALITY):
+        if value.startswith(FormulaCharsEnum.START):
             self._set_formula(_letter, value)
         else:
             self._set_value(_letter, value)
@@ -54,13 +66,18 @@ class Sheet:
     def _set_formula(self, letter: LetterValue, value: str) -> None:
         cell = self._cell(letter)
         ast = self._ast_tree(value)
-        cell.value = self._evaluate(ast)
+        result = self._evaluate(ast)
 
-    def _ast_tree(self, value: str) -> ASTNode:
+        if isinstance(result, NumberValue):
+            cell.value = result
+        else:
+            raise InvaliCellValueTypeError(result)
+
+    def _ast_tree(self, value: str) -> "ASTNode":
         tokens = self._tokenizer.tokenize(value)
         return self._ast_builder.build(tokens)
 
-    def _evaluate[Node: ASTNode](self, node: Node):  # noqa: ANN202
+    def _evaluate(self, node: "ASTNode") -> NumberValue | list[NumberValue]:
         if isinstance(node, NumberNode):
             return node.value
 
@@ -77,10 +94,11 @@ class Sheet:
             )
 
         if isinstance(node, BinaryOpNode):
-            return call_op(
-                node.operator,
-                self._evaluate(node.left),
-                self._evaluate(node.right),
-            )
+            left = self._evaluate(node.left)
+            right = self._evaluate(node.right)
+
+            if isinstance(left, NumberValue) and isinstance(right, NumberValue):
+                return call_op(node.operator, left, right)
+            raise UnexpectedOperandsToOperationError(left, right)
 
         raise InvalidNodeTypeError(node)

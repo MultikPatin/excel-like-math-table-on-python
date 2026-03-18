@@ -12,6 +12,12 @@ class InvalidTokenValueError(ServiceError):
         super().__init__(msg)
 
 
+class InvaliCellValueTypeError(ServiceError):
+    def __init__(self, value: Any) -> None:  # noqa: ANN401
+        msg = f"Invalid Cell velue type: {type(value)}"
+        super().__init__(msg)
+
+
 class InvalidNodeTypeError(ServiceError):
     def __init__(self, node: Any) -> None:  # noqa: ANN401
         msg = f"Invalid Node type: {type(node)}"
@@ -45,4 +51,11 @@ class UnexpectedTokenError(ServiceError):
 class UnexpectedTokenTypeError(ServiceError):
     def __init__(self, actual: Any, expected: Any) -> None:  # noqa: ANN401
         msg = f"Expected type: {expected}, type received: {actual}"
+        super().__init__(msg)
+
+
+class UnexpectedOperandsToOperationError(ServiceError):
+    def __init__(self, left: Any, right: Any) -> None:  # noqa: ANN401
+        msg = f"Unexpected operands: {left} and {right} "
+        f"of types {type(left)} and {type(right)}"
         super().__init__(msg)

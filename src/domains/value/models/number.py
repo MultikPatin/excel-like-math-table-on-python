@@ -15,7 +15,7 @@ class NumberValue(Value, float):
         try:
             v = float(value) if FormulaCharsEnum.DOT in value else int(value)
         except (ValueError, TypeError) as e:
-            raise InvalidNumberValueError from e
+            raise InvalidNumberValueError(value) from e
 
         return cls(v)
 

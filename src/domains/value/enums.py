@@ -42,7 +42,7 @@ class FormulaCharsEnum(StrEnum):
     DOT = "."
     COLON = ":"
     SEMICOLON = ";"
-    EQUALITY = "="
+    START = "="
 
     @classmethod
     def values_set(cls) -> set[str]:

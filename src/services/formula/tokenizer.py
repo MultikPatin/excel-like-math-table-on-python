@@ -11,7 +11,7 @@ class Tokenizer:
     def __init__(self) -> None:
         self._text: str = ""
         self._cursor: int = 0
-        self._tokens: list[Token] = []
+        self._tokens = []
 
     def _reset(self, text: str) -> None:
         self._sanitize_text(text)
@@ -19,8 +19,8 @@ class Tokenizer:
         self._tokens: list[Token] = []
 
     def _sanitize_text(self, text: str) -> None:
-        if not text.startswith(FormulaCharsEnum.EQUALITY):
-            msg = f"Formula must start with '{FormulaCharsEnum.EQUALITY}'"
+        if not text.startswith(FormulaCharsEnum.START):
+            msg = f"Formula must start with '{FormulaCharsEnum.START}'"
             raise SyntaxError(msg)
 
         self._text = text[1:]

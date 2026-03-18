@@ -1,14 +1,13 @@
-from collections.abc import Callable
+from collections.abc import Callable, MutableSequence
+from typing import TYPE_CHECKING
 
 from src.domains.node import (
-    ASTNode,
     BinaryOpNode,
     FunctionNode,
     LetterNode,
     NumberNode,
     RangeNode,
 )
-from src.domains.token import Token, TypeTokenValue
 from src.domains.value import (
     FirstPriorityOperatorsEnum,
     SecondPriorityOperatorsEnum,
@@ -19,10 +18,16 @@ from src.services.exceptions import (
     UnexpectedTokenTypeError,
 )
 
+if TYPE_CHECKING:
+    from src.domains.node import ASTNode
+    from src.domains.token import Token, TypeTokenValue
+    from src.domains.value import OperatorEnumType
+
+
+type NextToken = Token | None
+
+
 INVALID_TYPE = "Invalid token value type, received: {type}"
-type OperatorEnumType = (
-    type[FirstPriorityOperatorsEnum] | type[SecondPriorityOperatorsEnum]
-)
 
 
 class ASTBuilder:
@@ -30,21 +35,21 @@ class ASTBuilder:
 
     def __init__(self) -> None:
         self._cursor = 0
-        self._tokens: list[Token] = []
+        self._tokens = []
 
-    def build(self, tokens: list[Token]) -> ASTNode:
+    def build(self, tokens: "MutableSequence[Token]") -> "ASTNode":
         self._cursor = 0
         self._tokens = tokens
         ast = self._parse_expression()
         self._expect(TypeEnum.EOF, inc_cursor=False)
         return ast
 
-    def _parse_expression(self) -> ASTNode:
+    def _parse_expression(self) -> "ASTNode":
         return self._parse_second_level_operators()
 
     def _parse_operators(
-        self, func: Callable[[], ASTNode], enum: OperatorEnumType
-    ) -> ASTNode:
+        self, func: Callable[[], "ASTNode"], enum: "OperatorEnumType"
+    ) -> "ASTNode":
         left = func()
 
         while self._peek().is_type_operator():
@@ -58,19 +63,19 @@ class ASTBuilder:
 
         return left
 
-    def _parse_second_level_operators(self) -> ASTNode:
+    def _parse_second_level_operators(self) -> "ASTNode":
         return self._parse_operators(
             self._parse_first_level_operators,
             SecondPriorityOperatorsEnum,
         )
 
-    def _parse_first_level_operators(self) -> ASTNode:
+    def _parse_first_level_operators(self) -> "ASTNode":
         return self._parse_operators(
             self._parse_elements,
             FirstPriorityOperatorsEnum,
         )
 
-    def _parse_elements(self) -> ASTNode:
+    def _parse_elements(self) -> "ASTNode":
         token = self._peek()
 
         if token.is_type_number():
@@ -119,13 +124,13 @@ class ASTBuilder:
         self._expect(TypeEnum.RPAREN)
         return FunctionNode(function=function, args=args)
 
-    def _peek(self) -> Token:
+    def _peek(self) -> "Token":
         return self._tokens[self._cursor]
 
-    def _peek_value(self) -> TypeTokenValue:
+    def _peek_value(self) -> "TypeTokenValue":
         return self._peek().value
 
-    def _peek_next(self) -> Token | None:
+    def _peek_next(self) -> NextToken:
         if self._cursor + 1 < len(self._tokens):
             return self._tokens[self._cursor + 1]
         return None
@@ -136,7 +141,7 @@ class ASTBuilder:
             return False
         return self._peek().is_type_cell() and next_.is_type_colon()
 
-    def _expect(self, expected: TypeEnum, inc_cursor: bool = True) -> Token:
+    def _expect(self, expected: TypeEnum, inc_cursor: bool = True) -> "Token":
         actual = self._peek().type
         if actual != expected:
             raise UnexpectedTokenTypeError(actual, expected)

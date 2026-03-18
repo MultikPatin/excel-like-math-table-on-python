@@ -1,3 +1,4 @@
+from ._type import OperatorEnumType
 from .enums import (
     FirstPriorityOperatorsEnum,
     FormulaCharsEnum,
@@ -23,6 +24,7 @@ __all__ = [
     "FunctionsEnum",
     "LetterValue",
     "NumberValue",
+    "OperatorEnumType",
     "OperatorValue",
     "SecondPriorityOperatorsEnum",
     "TypeEnum",
