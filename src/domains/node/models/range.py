@@ -1,43 +1,29 @@
-from typing import Any
+from dataclasses import dataclass
+from typing import Any, Self
 
 from src.domains.node.exceptions import (
     InvalidRangeEbdValueTypeError,
     InvalidRangeStartValueTypeError,
 )
-from src.domains.value import LetterValue, Value
-
-from .base import ASTNode
+from src.domains.value import LetterValue
 
 
-class RangeNode(ASTNode):
-    __slots__ = ("_end", "_start")
+@dataclass(frozen=True, slots=True)
+class RangeNode:
+    start: LetterValue
+    end: LetterValue
 
-    _start: LetterValue
-    _end: LetterValue
-
-    def __init__(self, start: Value, end: Value) -> None:
+    @classmethod
+    def model_validate(cls, start: Any, end: Any) -> Self:  # noqa: ANN401
         if not isinstance(start, LetterValue):
             raise InvalidRangeStartValueTypeError(start, LetterValue)
         if not isinstance(end, LetterValue):
             raise InvalidRangeEbdValueTypeError(end, LetterValue)
-
-        self._start = start
-        self._end = end
-
-    @property
-    def start(self) -> LetterValue:
-        return self._start
-
-    @property
-    def end(self) -> LetterValue:
-        return self._end
-
-    def dump(self) -> dict[str, Any]:
-        return {"RANGE": {"start": self._start, "end": self._end}}
+        return cls(start=start, end=end)
 
     def expand(self) -> list[LetterValue]:
-        s_pos = self._start.position()
-        e_pos = self._end.position()
+        s_pos = self.start.position()
+        e_pos = self.end.position()
 
         return [
             LetterValue(f"{num_to_letters(col)}{row}")

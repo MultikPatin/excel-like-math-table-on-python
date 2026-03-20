@@ -54,6 +54,12 @@ class UnexpectedTokenTypeError(ServiceError):
         super().__init__(msg)
 
 
+class UnexpectedFormulaStartCharError(ServiceError):
+    def __init__(self, actual: Any, expected: Any) -> None:  # noqa: ANN401
+        msg = f"Expected character: {expected}, received character: {actual}"
+        super().__init__(msg)
+
+
 class UnexpectedOperandsToOperationError(ServiceError):
     def __init__(self, left: Any, right: Any) -> None:  # noqa: ANN401
         msg = f"Unexpected operands: {left} and {right} "

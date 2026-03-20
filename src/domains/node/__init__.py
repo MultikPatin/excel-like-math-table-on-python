@@ -1,5 +1,14 @@
+from .exceptions import (
+    DomainError,
+    InvalidBinaryOpValueTypeError,
+    InvalidFunctionValueTypeError,
+    InvalidLetterValueTypeError,
+    InvalidNumberValueTypeError,
+    InvalidRangeEbdValueTypeError,
+    InvalidRangeStartValueTypeError,
+    InvalidValueTypeError,
+)
 from .models import (
-    ASTNode,
     BinaryOpNode,
     FunctionNode,
     LetterNode,
@@ -7,10 +16,20 @@ from .models import (
     RangeNode,
 )
 
+type AnyNode = LetterNode | NumberNode | FunctionNode | BinaryOpNode | RangeNode
+
 __all__ = [
-    "ASTNode",
+    "AnyNode",
     "BinaryOpNode",
+    "DomainError",
     "FunctionNode",
+    "InvalidBinaryOpValueTypeError",
+    "InvalidFunctionValueTypeError",
+    "InvalidLetterValueTypeError",
+    "InvalidNumberValueTypeError",
+    "InvalidRangeEbdValueTypeError",
+    "InvalidRangeStartValueTypeError",
+    "InvalidValueTypeError",
     "LetterNode",
     "NumberNode",
     "RangeNode",

@@ -1,35 +1,23 @@
-from typing import Any
+from collections.abc import Iterable
+from dataclasses import dataclass
+from typing import TYPE_CHECKING, Any, Self
 
 from src.domains.node.exceptions import InvalidFunctionValueTypeError
-from src.domains.value import FunctionValue, Value
+from src.domains.value import FunctionValue
 
-from .base import ASTNode
+if TYPE_CHECKING:
+    from src.domains.node import NumberNode
+
+type Args = Iterable[NumberNode]
 
 
-class FunctionNode(ASTNode):
-    __slots__ = ("_args", "_function")
+@dataclass(frozen=True, slots=True)
+class FunctionNode:
+    func: FunctionValue
+    args: Args
 
-    _function: FunctionValue
-
-    def __init__(self, function: Value, args: list[ASTNode]) -> None:
-        if not isinstance(function, FunctionValue):
-            raise InvalidFunctionValueTypeError(function, FunctionValue)
-
-        self._function = function
-        self._args = args
-
-    @property
-    def function(self) -> FunctionValue:
-        return self._function
-
-    @property
-    def args(self) -> list[ASTNode]:
-        return self._args
-
-    def dump(self) -> dict[str, Any]:
-        return {
-            "FunctionNode": {
-                "FUNC": self._function,
-                "ARGS": [a.dump() for a in self._args],
-            }
-        }
+    @classmethod
+    def model_validate(cls, func: Any, args: Args) -> Self:  # noqa: ANN401
+        if not isinstance(func, FunctionValue):
+            raise InvalidFunctionValueTypeError(func, FunctionValue)
+        return cls(func=func, args=args)

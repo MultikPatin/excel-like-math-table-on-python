@@ -2,6 +2,7 @@ from collections.abc import Callable, MutableSequence
 from typing import TYPE_CHECKING
 
 from src.domains.node import (
+    AnyNode,
     BinaryOpNode,
     FunctionNode,
     LetterNode,
@@ -10,6 +11,7 @@ from src.domains.node import (
 )
 from src.domains.value import (
     FirstPriorityOperatorsEnum,
+    OperatorValue,
     SecondPriorityOperatorsEnum,
     TypeEnum,
 )
@@ -19,15 +21,14 @@ from src.services.exceptions import (
 )
 
 if TYPE_CHECKING:
-    from src.domains.node import ASTNode
-    from src.domains.token import Token, TypeTokenValue
     from src.domains.value import OperatorEnumType
 
-
-type NextToken = Token | None
+    from .token import Token, TypeTokenValue
 
 
 INVALID_TYPE = "Invalid token value type, received: {type}"
+
+type MaybeToken = Token | None
 
 
 class ASTBuilder:
@@ -37,54 +38,60 @@ class ASTBuilder:
         self._cursor = 0
         self._tokens = []
 
-    def build(self, tokens: "MutableSequence[Token]") -> "ASTNode":
+    def build(self, tokens: "MutableSequence[Token]") -> AnyNode:
         self._cursor = 0
         self._tokens = tokens
         ast = self._parse_expression()
         self._expect(TypeEnum.EOF, inc_cursor=False)
         return ast
 
-    def _parse_expression(self) -> "ASTNode":
+    def _parse_expression(self) -> AnyNode:
         return self._parse_second_level_operators()
 
     def _parse_operators(
-        self, func: Callable[[], "ASTNode"], enum: "OperatorEnumType"
-    ) -> "ASTNode":
+        self, func: Callable[[], AnyNode], enum: "OperatorEnumType"
+    ) -> AnyNode:
         left = func()
 
         while self._peek().is_type_operator():
             op = self._peek_value()
+            if not isinstance(op, OperatorValue):
+                raise UnexpectedTokenTypeError(op, OperatorValue)
             if op.value in enum:
                 self._cursor += 1
                 right = func()
-                left = BinaryOpNode(left=left, op=op, right=right)
+                left = BinaryOpNode.model_validate(left, op, right)
             else:
                 break
 
         return left
 
-    def _parse_second_level_operators(self) -> "ASTNode":
+    def _parse_second_level_operators(
+        self,
+    ) -> AnyNode:
         return self._parse_operators(
             self._parse_first_level_operators,
             SecondPriorityOperatorsEnum,
         )
 
-    def _parse_first_level_operators(self) -> "ASTNode":
+    def _parse_first_level_operators(
+        self,
+    ) -> AnyNode:
         return self._parse_operators(
             self._parse_elements,
             FirstPriorityOperatorsEnum,
         )
 
-    def _parse_elements(self) -> "ASTNode":
+    def _parse_elements(self) -> AnyNode:
         token = self._peek()
 
         if token.is_type_number():
             self._cursor += 1
-            return NumberNode(value=token.value)
+            return NumberNode.model_validate(token.value)
 
         if token.is_type_cell():
             self._cursor += 1
-            return LetterNode(letter=token.value)
+            return LetterNode.model_validate(token.value)
 
         if token.is_type_function():
             return self._parse_function()
@@ -112,7 +119,7 @@ class ASTBuilder:
                     self._expect(TypeEnum.COLON)
                     end = self._peek_value()
                     self._cursor += 1
-                    args.append(RangeNode(start=start, end=end))
+                    args.append(RangeNode.model_validate(start, end))
                 else:
                     args.append(self._parse_expression())
 
@@ -122,7 +129,7 @@ class ASTBuilder:
                 break
 
         self._expect(TypeEnum.RPAREN)
-        return FunctionNode(function=function, args=args)
+        return FunctionNode.model_validate(function, args)
 
     def _peek(self) -> "Token":
         return self._tokens[self._cursor]
@@ -130,7 +137,7 @@ class ASTBuilder:
     def _peek_value(self) -> "TypeTokenValue":
         return self._peek().value
 
-    def _peek_next(self) -> NextToken:
+    def _peek_next(self) -> MaybeToken:
         if self._cursor + 1 < len(self._tokens):
             return self._tokens[self._cursor + 1]
         return None

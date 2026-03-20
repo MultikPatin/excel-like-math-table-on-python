@@ -3,10 +3,8 @@ from typing import Self
 from src.domains.value.enums import FormulaCharsEnum
 from src.domains.value.exceptions import InvalidNumberValueError
 
-from .base import Value
 
-
-class NumberValue(Value, float):
+class NumberValue(float):
     # def __init__(self, value: float | int = 0) -> None:
     #     self._value = value
 

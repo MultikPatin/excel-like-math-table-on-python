@@ -24,7 +24,7 @@ if __name__ == "__main__":
         ic(formula)
         tokens = tokenizer.tokenize(formula)
         ast = ast_builder.build(tokens)
-        ic(ast.dump())
+        ic(ast)
 
     ic("=============================================================")
 

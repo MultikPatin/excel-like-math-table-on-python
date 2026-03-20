@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from .enums import get_all_operators
+from .enums import FormulaCharsEnum, get_all_operators
 
 if TYPE_CHECKING:
     from re import Pattern
@@ -14,6 +14,12 @@ class DomainError(Exception):
 class InvalidOperatorValueError(DomainError):
     def __init__(self, value: str) -> None:
         msg = f"Operator must be one of: {get_all_operators()}, but got {value}"
+        super().__init__(msg)
+
+
+class InvalidFormulaValueError(DomainError):
+    def __init__(self, formula: str) -> None:
+        msg = f"Formula must start with {FormulaCharsEnum.START}"
         super().__init__(msg)
 
 

@@ -1,25 +1,16 @@
-from typing import Any
+from dataclasses import dataclass
+from typing import Any, Self
 
 from src.domains.node.exceptions import InvalidLetterValueTypeError
-from src.domains.value import LetterValue, Value
-
-from .base import ASTNode
+from src.domains.value import LetterValue
 
 
-class LetterNode(ASTNode):
-    __slots__ = ("_letter",)
+@dataclass(frozen=True, slots=True)
+class LetterNode:
+    letter: LetterValue
 
-    _letter: LetterValue
-
-    def __init__(self, letter: Value) -> None:
+    @classmethod
+    def model_validate(cls, letter: Any) -> Self:  # noqa: ANN401
         if not isinstance(letter, LetterValue):
             raise InvalidLetterValueTypeError(letter, LetterValue)
-
-        self._letter = letter
-
-    @property
-    def letter(self) -> LetterValue:
-        return self._letter
-
-    def dump(self) -> dict[str, Any]:
-        return {"CELL": self._letter}
+        return cls(letter=letter)

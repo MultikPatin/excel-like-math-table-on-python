@@ -1,8 +1,11 @@
-from src.domains.token import Token
 from src.domains.value import FormulaCharsEnum, TypeEnum
-from src.services.exceptions import UnexpectedCharError
+from src.services.exceptions import (
+    UnexpectedCharError,
+    UnexpectedFormulaStartCharError,
+)
 
 from .char import Char
+from .token import Token
 
 
 class Tokenizer:
@@ -20,9 +23,9 @@ class Tokenizer:
 
     def _sanitize_text(self, text: str) -> None:
         if not text.startswith(FormulaCharsEnum.START):
-            msg = f"Formula must start with '{FormulaCharsEnum.START}'"
-            raise SyntaxError(msg)
-
+            raise UnexpectedFormulaStartCharError(
+                text[:1], FormulaCharsEnum.START
+            )
         self._text = text[1:]
 
     def _in_range(self) -> bool:
@@ -32,7 +35,7 @@ class Tokenizer:
         return Char(self._text[self._cursor])
 
     def _set_token(self, type_: TypeEnum, value: str | None = None) -> None:
-        self._tokens.append(Token(type_=type_, value=value))
+        self._tokens.append(Token.model_validate(type_=type_, value=value))
 
     def tokenize(self, text: str) -> list[Token]:
         self._reset(text)
